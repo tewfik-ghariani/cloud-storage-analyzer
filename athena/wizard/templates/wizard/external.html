@@ -1,0 +1,108 @@
+{% extends "wizard/base.html" %}
+
+{% block title %} External Bucket {% endblock %}
+
+{% block wizard_content %}
+
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li{% if message.tags %} class="alert alert-{{ message.tags }}"{% endif %}>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+
+
+    <div ng-controller="externalController">
+
+
+        <flash-message></flash-message>
+
+
+        <form action="{% url 'external' %}" method="POST">
+
+            {% csrf_token %}
+
+            {#  ---------------------------------- Start Modal ----------------------------------  #}
+
+            <div id="purgeModal" class="modal fade" role="dialog">
+                <div class="modal-dialog">
+
+                    <!-- Modal content-->
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title">Delete all contents?</h4>
+                        </div>
+                        <div class="modal-body">
+
+                            You are about to purge the external bucket
+
+
+                        </div>
+                        <div class="modal-footer">
+                            <input name="purge" class="btn btn-danger btn-xs"
+                                   value="Yes, Purge Now" type="submit"/>
+                            <button type="button" class="btn btn-xs btn-default"
+                                    data-dismiss="modal">Cancel
+                            </button>
+
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            {#  ---------------------------------- End Modal ----------------------------------  #}
+
+
+            <div class="row">
+                <input type="button" class="btn btn-danger btn-xs pull-right"
+                       data-target="#purgeModal" value="Purge"
+                       data-toggle="modal"/>
+            </div>
+            <br>
+            <div class="list-group">
+
+                {% if not_front %}
+                    <a class="list-group-item">
+                        <input class="btn btn-md btn-primary" name="back" type="submit" value="..">
+                        <input type="hidden" value="{{ Parent }}" name="Parent"/>
+                        <span class="badge"> {{ Parent }} </span>
+                    </a>
+                {% endif %}
+
+                {% for PRE in folders %}
+                    <a class="list-group-item">
+                        <input class="btn btn-md btn-info" name="prefix" type="submit" value="{{ PRE }}"/>
+                    </a>
+                {% endfor %}
+
+
+
+                {% for bucket in data %}
+                    <a class="list-group-item">
+                        {{ bucket }}
+
+                        <button type="button" ng-click="download($event)" name="download" value="{{ bucket }}"
+                                class="btn btn-xs btn-default pull-right">
+                            <span> Download  <i class="glyphicon glyphicon-download"> </i> </span>
+                        </button>
+
+
+                        <button type="button" ng-click="delete($event)" name="delete" value="{{ bucket }}"
+                                class="btn btn-xs btn-default pull-right">
+                            <span class="badge"> Delete </span>
+                        </button>
+                    </a>
+                {% endfor %}
+
+            </div>
+
+        </form>
+    </div>
+
+
+{% endblock %}

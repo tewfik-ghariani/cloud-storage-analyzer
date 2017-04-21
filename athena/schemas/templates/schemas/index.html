@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %} Cloud Storage Analyzer {% endblock %}
+
+{% block content %}
+    <div ng-app="schemaApp">
+
+        <ui-view>
+            <h3> Customers </h3>
+
+
+            <div class="list-group">
+                {% for customer in customers %}
+                    <a ui-sref="list({customer_shortcut: '{{ customer.shortcut }}' })"
+                       class="list-group-item list-group-item-text"> {{ customer.label }} </a>
+                {% endfor %}
+            </div>
+        </ui-view>
+
+    </div>
+
+{% endblock %}
+
+
+
+
+
+
+{% block extra_static %}
+
+    {% load static %}
+
+    <!---------------------------------- AngularJS -------------------------->
+    <script type="text/javascript" src="{% static 'angular/angular.min.js' %}"></script>
+
+    <!-- angular-animate -->
+    <script type="text/javascript" src="{% static 'angular-animate/angular-animate.min.js' %}"></script>
+
+    <!-- angular-ui-router -->
+    <script type="text/javascript" src="{% static 'angular-ui-router/release/angular-ui-router.min.js' %}"></script>
+
+    <!-- ngProgress -->
+    <script type="text/javascript" src="{% static 'ngprogress/build/ngprogress.min.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'ngprogress/ngProgress.css' %}"/>
+
+    <!-- angular-flash-alert -->
+    <script type="text/javascript" src="{% static 'angular-flash-alert/dist/angular-flash.min.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'angular-flash-alert/dist/angular-flash.min.css' %}"/>
+
+    <!-- checklist-model -->
+    <script type="text/javascript" src="{% static 'checklist-model/checklist-model.js' %}"></script>
+
+    <!-- ag-grid -->
+    <script type="text/javascript" src="{% static 'ag-grid/dist/ag-grid.min.js' %}"></script>
+
+    <!-- custom -->
+    <script type="text/javascript" src="{% static 'schemas/js/app.js' %}"></script>
+    <script type="text/javascript" src="{% static 'schemas/js/config.js' %}"></script>
+    <script type="text/javascript" src="{% static 'schemas/js/angular/controllers/listController.js' %}"></script>
+    <script type="text/javascript" src="{% static 'schemas/js/angular/controllers/configController.js' %}"></script>
+    <script type="text/javascript" src="{% static 'schemas/js/angular/controllers/detailsController.js' %}"></script>
+    <script type="text/javascript" src="{% static 'schemas/js/angular/services.js' %}"></script>
+
+{% endblock %}

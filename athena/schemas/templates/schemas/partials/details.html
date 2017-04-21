@@ -1,0 +1,48 @@
+
+<!--
+<script>
+    $(document).ready(function () {
+        $('#page').fadeIn(2000);
+    });
+
+    // loader shown on details page
+$(function () {
+    $(".preload").fadeOut(2000, function () {
+        $(".postload").fadeIn(1000);
+    });
+});
+
+
+</script>
+
+<div class="preload"><img src="http://i.imgur.com/KUJoe.gif">
+</div>
+-->
+<div ng-show="exception" class="alert alert-danger"> [[error]]</div>
+
+<div ag-grid="gridOptions" class="col-md-8-offset ag-fresh">
+
+    <section id="result" >
+
+        <div class="table-responsive">
+            <table class="table">
+
+                <thead>
+                <tr>
+
+                    <td ng-repeat="head in selected_items"><h3>[[ head ]] </h3></td>
+
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="row in content">
+                    <td ng-repeat="cell in row"> [[cell]]</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+
+    </section>
+
+</div>

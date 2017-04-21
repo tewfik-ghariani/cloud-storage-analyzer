@@ -1,0 +1,8 @@
+athena/components
+athena/lib/static
+venv
+athena/.idea
+
+
+syntax: glob
+*.pyc

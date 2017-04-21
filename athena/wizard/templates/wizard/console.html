@@ -1,0 +1,120 @@
+{% extends "wizard/base.html" %}
+
+{% block title %} Console {% endblock %}
+
+{% block wizard_content %}
+
+    <div ng-controller="consoleController">
+        <form action="{% url 'console' %}" method="POST" class="form-inline">
+            {% csrf_token %}
+
+            {#  ---------------------------------- Start Modal ----------------------------------  #}
+
+            <div id="deleteModal" class="modal fade" role="dialog">
+                <div class="modal-dialog">
+
+                    <!-- Modal content-->
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title">Delete?</h4>
+                        </div>
+                        <div class="modal-body">
+
+                            You are about to delete the <span class="label label-danger">[[to_delete]]</span> [[type]]
+
+                        </div>
+                        <div class="modal-footer">
+                            <input ng-click="delete()" class="btn btn-danger btn-xs" value="Delete Now" type="button"/>
+                            <button type="button" class="btn btn-xs btn-default" data-dismiss="modal">Cancel</button>
+
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            {#  ---------------------------------- End Modal ----------------------------------  #}
+
+            <flash-message></flash-message>
+
+            <div class="row">
+
+                <div class="form-group">
+                    <button type="button" class="btn btn-primary pull-left" value="dbs" ng-click="dbs()"> Show
+                        Databases
+                    </button>
+
+
+                    <a class="btn btn-xs" data-toggle="collapse" data-target="#new_db">
+                        <i class="glyphicon glyphicon-pencil"></i>
+                    </a>
+                </div>
+
+                <div id="new_db" class="collapse">
+                    <div class="form-group">
+                        <label for="new_database"> New Database </label>
+                        <input id="new_database" name="new_database" ng-model="new_database" class="form-control"
+                               type="text"/>
+                        <button type="button" name="clicked" ng-click="new_db()" class="btn btn-xs btn-success">
+                            <i class="glyphicon glyphicon-floppy-disk"></i>
+                        </button>
+                    </div>
+                </div>
+
+
+                <a href="{% url 'add_table' %}">
+                    <i class="glyphicon glyphicon-plus-sign pull-right"> New Table </i>
+                </a>
+            </div>
+
+
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="list-group" >
+
+                        <a class="list-group-item" ng-repeat="db in databases">
+                            <input type="button" class="btn btn-default" ng-click="get_tables()" value="[[ db ]]"/>
+
+                            <button type="button" class="btn btn-xs  pull-right" ng-click="associate()"
+                                    data-target="#deleteModal"
+                                    data-toggle="modal" value="[[ db ]]">
+                                <i class="glyphicon glyphicon-remove"></i>
+                            </button>
+                        </a>
+
+                    </div>
+
+                </div>
+
+
+                <div class="col-md-3">
+
+                [[no_tables]]
+                [[parent_db]]
+                    <div class="list-group" >
+
+                        <a class="list-group-item" ng-repeat="table in tables">
+                            [[table]]
+                            <button class="btn btn-xs pull-right" type="button"
+                                    data-target="#deleteModal"
+                                    data-toggle="modal" ng-click="associate()" value="[[ table ]]">
+                                <i class="glyphicon glyphicon-remove"></i>
+                            </button>
+                        </a>
+
+                    </div>
+                </div>
+
+
+            </div>
+        </form>
+    </div>
+
+{% endblock %}
+
+
+
+
+

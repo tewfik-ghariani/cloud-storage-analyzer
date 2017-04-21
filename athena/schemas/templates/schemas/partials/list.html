@@ -1,0 +1,127 @@
+<!--   <div class="row">
+      <div class="pager">
+    <span class="step-links">
+        {% if data.has_previous %}
+            <a href="?page=1">
+            <label class="btn btn-toggle" for="first">
+            <i id="first" class="glyphicon glyphicon-fast-backward"></i>
+            </label>
+            </a>
+
+            <a href="?page={{ data.previous_page_number }}">
+             <label class="btn btn-toggle" for="previous">
+                <i id="previous" class="glyphicon glyphicon-step-backward"></i>
+             </label>
+            </a>
+        {% endif %}
+
+        <span class="current">
+              <b>{{ data.number }} / {{ data.paginator.num_pages }} </b>
+           </span>
+
+        {% if data.has_next %}
+            <a href="?page={{ data.next_page_number }}">
+             <label class="btn btn-toggle" for="next">
+                 <i id="next" class="glyphicon glyphicon-step-forward"></i>
+             </label>
+            </a>
+
+            <a href="?page={{ data.paginator.num_pages }}">
+            <label class="btn btn-toggle" for=last">
+                 <i id="last" class="glyphicon glyphicon-fast-forward"></i>
+            </label>
+            </a>
+        {% endif %}
+    </span>
+        </div>
+    </div>
+
+-->
+
+<div class="row">
+
+
+    <div class="input-group col-md-offset-6">
+
+
+        <input type="text"
+               ng-model="regex"
+               name="search_text"
+               class="form-control"
+               required
+               placeholder="Search">
+        <div class="input-group-btn">
+            <button class="btn btn-default"
+                    ng-click="search()"
+                    type="submit">
+                <i class="glyphicon glyphicon-search"></i>
+            </button>
+        </div>
+    </div>
+    <div class="col-md-offset-6">
+        <div class="label label-info">
+            You may search through all the bucket for a specific file
+            (Regular Expressions are accepted)
+        </div>
+    </div>
+
+    <hr>
+
+    <flash-message></flash-message>
+
+
+    <div class="list-group">
+
+        <a ng-show="front" class="list-group-item">
+            <button class="btn btn-md btn-primary"
+                    ng-click="navigate()"
+                    type="button"
+                    value="..">..
+            </button>
+            <span class="badge"> [[ prefix ]] </span>
+        </a>
+
+
+        <a ng-repeat="PRE in folders" class="list-group-item">
+            <input ng-click="navigate($event)"
+                   class="btn btn-md btn-info"
+                   name="prefix"
+                   type="submit"
+                   value="[[ PRE ]]"/>
+        </a>
+
+
+        <a ng-repeat="object in objects" class="list-group-item">
+            <button type="button" ng-click="download($event)" value="[[object]]"
+                    class="btn btn-xs btn-default ">
+                <i class="glyphicon glyphicon-download "> </i>
+            </button>
+
+
+            <input ng-click="configGet($event)"
+                   type="submit" value="[[object]]"
+                   class="btn btn-md btn-default"/>
+            <span class="badge"> File </span>
+
+        </a>
+
+    </div>
+
+
+    <!--
+
+    <div class="row">
+        <div class="col-md-4 col-md-offset-4">
+            <ul class="pagination">
+                {% for num_page in data.custom_range %}
+                    {% if num_page == data.number %}
+                        <li class="active"><a href="?page={{ num_page }}"> {{ num_page }}</a></li>
+                    {% else %}
+                        <li><a href="?page={{ num_page }}"> {{ num_page }}</a></li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+-->

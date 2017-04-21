@@ -1,0 +1,108 @@
+{% extends "wizard/base.html" %}
+
+{% block title %} New table {% endblock %}
+
+{% block wizard_content  %}
+
+<form action="{% url 'create' %}" method="POST" class="form-inline">
+    {% csrf_token %}
+<div class="row">
+    <div class="col-md-7">
+
+        <div id="columns" >
+            <div id="one_column">
+          <div class="form-group" >
+            <label for="column_label"> Column Name  </label>
+                <input id="column_label" class="form-control" name="col_label" type="text"  required/>
+                </div>
+              <div class="form-group" >
+              <label for="column_type">  Column Type  </label>
+                  <select id="column_type" name="col_type" class="form-control">
+                      {% for type in common_types %}
+                          {% if type == 'string' %}
+                          <option value="{{ type }}" selected> {{ type }}</option>
+                          {% else %}
+                      <option value="{{ type }}"  >{{ type }}</option>
+                          {% endif %}
+                       {% endfor %}
+                  </select>
+            </div>
+            </div>
+        </div>
+
+
+    <a class="btn btn-sm btn-success pull-left" id="add_column"> Add a column </a>
+
+    </div>
+    <div class="col-md-5  ">
+
+        <div class="form-group">
+            <label for="database"> Database </label>
+                 <select id="database" class="form-control" name="database">
+                     {% for db in databases %}
+                     <option value="{{ db }}">{{ db }}</option>
+                     {% endfor %}
+                 </select>
+        </div>
+
+        <div class="form-group">
+            <label for="table"> Table </label>
+            <input id="table" name="table" class="form-control"  type="text" required/>
+        </div>
+
+
+        <div class="form-group">
+            <label for="Location"> S3 Location </label>
+            <input id="Location"
+                   name="location"
+                   class="form-control"
+                   value="s3://athena-internship/tmp/"
+                   placeholder="s3://athena-internship/"
+                   type="text"
+                   required/>
+        </div>
+
+
+
+        <div class="form-group" >
+            <label for="Delim"> Delim </label>
+            <input id="Delim" name="delim" class="form-control" type="text" required/>
+        </div>
+
+             </br>
+
+
+    <!-- Trigger the modal with a button -->
+<button type="button" class="btn btn-info btn-md pull-right" data-toggle="modal" data-target="#myModal">Submit</button>
+
+<!-- Modal -->
+<div id="myModal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Confirmation</h4>
+      </div>
+      <div class="modal-body">
+        <p>Are you certain?</p>
+      </div>
+      <div class="modal-footer">
+             <button type="submit" class="btn btn-md btn-danger pull-right"> Confirm </button>
+        <button type="button" class="btn btn-md btn-default" data-dismiss="modal"> Close </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+    </div>
+
+
+</div>
+
+</form>
+
+{% endblock %}

@@ -1,0 +1,15 @@
+/* navbar */
+.navbar-default {
+    background-color: #ffffff;
+    border-color: #d2d2d2;
+}
+.navbar-default .navbar-nav > li > a {
+    font-size: 14px;
+    color: #000000;
+}
+
+.navbar-default .navbar-nav > li > a:hover,
+.navbar-default .navbar-nav > li > a:focus {
+    color: #c4dce8;
+}
+

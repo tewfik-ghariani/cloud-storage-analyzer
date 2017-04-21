@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    {% load static %}
+
+    <link rel="icon" id="icon" href="{% static 'images/wizard_icon.png' %}">
+    <meta charset="utf-8">
+    <title>  {% block title %} Wizard{% endblock %}</title>
+
+
+</head>
+
+<body ng-app="wizardApp">
+
+
+<nav class="navbar navbar-collapse collapse">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="{% url 'welcome' %}"><img src="{% static 'images/infor.png' %}"/> </a>
+
+        </div>
+
+
+        <ul class="nav navbar-nav">
+            <li><a href="{% url 'wizard' %}"><i class="fa fa-home"></i></a></li>
+            <li><a href="{% url 'welcome' %}"> View the Site </a></li>
+            <li><a href="{% url 'console' %}"> Console </a></li>
+            <li><a href="{% url 'admin:index' %}"> Admin </a></li>
+            <li><a href="{% url 'external' %}"> Bucket </a></li>
+        </ul>
+
+        <div class="collapse navbar-collapse">
+            <ul class="nav navbar-nav navbar-right">
+
+
+                <li><a href="{% url 'logout' %}"> <i class="glyphicon glyphicon-log-out"> Logout </i> </a></li>
+
+                <li><a href="{% url 'profile' %}"><i class="glyphicon glyphicon-user"> {{ user.username }}  </i></a>
+                </li>
+
+
+            </ul>
+        </div>
+
+    </div>
+</nav>
+
+
+<div class="container">
+
+
+    {% block wizard_content %}
+
+        <div class="jumbotron">
+            <h1> Welcome Admin! </h1>
+            <h3> This is the hidden Athena console! You may see databases, tables, and create new ones!</h3>
+
+
+        </div>
+
+
+    {% endblock %}
+
+
+    <div class="row">
+        <footer>&copy; Predictix</footer>
+    </div>
+
+
+    <!-- font-awesome -->
+    <link rel="stylesheet" type="text/css" href="{% static 'font-awesome/css/font-awesome.min.css' %}"/>
+
+
+    <!-- JQuery -->
+    <script type="text/javascript" src="{% static 'jquery/dist/jquery.min.js' %}"></script>
+
+
+    <!-- bootstrap -->
+    <link rel="stylesheet" type="text/css" href="{% static 'bootstrap/dist/css/bootstrap.min.css' %}"/>
+    <script type="text/javascript" src="{% static 'bootstrap/dist/js/bootstrap.min.js' %}"></script>
+
+
+    <!-- underscore -->
+    <script type="text/javascript" src="{% static 'underscore/underscore-min.js' %}"></script>
+
+
+    <!---------------------------------- AngularJS -------------------------->
+    <script type="text/javascript" src="{% static 'angular/angular.min.js' %}"></script>
+
+    <!-- angular-animate -->
+    <script type="text/javascript" src="{% static 'angular-animate/angular-animate.min.js' %}"></script>
+
+
+    <!-- ngProgress -->
+    <script type="text/javascript" src="{% static 'ngprogress/build/ngprogress.min.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'ngprogress/ngProgress.css' %}"/>
+
+    <!-- angular-flash-alert -->
+    <script type="text/javascript" src="{% static 'angular-flash-alert/dist/angular-flash.min.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'angular-flash-alert/dist/angular-flash.min.css' %}"/>
+
+
+    <!-- custom -->
+    <script type="text/javascript" src="{% static 'wizard/js/app.js' %}"></script>
+    <script type="text/javascript" src="{% static 'wizard/js/angular/controllers/consoleController.js' %}"></script>
+    <script type="text/javascript" src="{% static 'wizard/js/angular/controllers/externalController.js' %}"></script>
+    <script type="text/javascript" src="{% static 'wizard/js/angular/services.js' %}"></script>
+
+    <!-- custom css -->
+    <link rel="stylesheet" href="{% static 'wizard/css/style.css' %}"/>
+    <!-- main js -->
+    <script type="text/javascript" src="{% static 'wizard/js/main.js' %}"></script>
+
+
+</div>
+</body>
+</html>
