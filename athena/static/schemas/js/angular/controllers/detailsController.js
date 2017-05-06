@@ -13,52 +13,76 @@ app.controller('detailsController', [
 
 
         $scope.progressbar.start();
-        $scope.exception = false;
+        $scope.arrived = false;
+        $scope.gotError = false;
+        $scope.search = '';
 
-
+        $scope.gridOptions = {
+            columnDefs: [],
+            rowData: [],
+            enableFilter: true,
+            enableColResize: true,
+            enableSorting: true,
+        };
 
         var customer = $state.params.customer;
         var object = $state.params.object;
         var headers = $state.params.headers;
         var conditions = $state.params.conditions;
-        console.log(object);
+        var custom = $state.params.custom;
 
-        detailsFactory.query(customer, object, headers, conditions).then(function (response) {
+
+        detailsFactory.query(customer, object, headers, conditions, custom).then(function (response) {
+            $scope.progressbar.complete();
+
             if (response.data.success) {
                 data = response.data.data;
                 $scope.content = data.content;
-                $scope.selected_items = data.selected_items;
-                $scope.progressbar.complete();
+                $scope.headers = data.headers;
+                $scope.arrived = true;
+                Flash.create('danger', data.msg, false);
+
+                $scope.columnDefs = [];
+                for (head in $scope.headers) {
+                    $scope.columnDefs.push({
+                        headerName: $scope.headers[head],
+                        field: $scope.headers[head]
+                    });
+                }
+
+
+                $scope.rowData = [];
+                for (row in $scope.content) {
+                    new_line = {};
+                    i = 0;
+                    for (head in $scope.headers) {
+                        new_line[$scope.headers[head]] = $scope.content[row][i];
+                        i++;
+                    }
+                    $scope.rowData.push(new_line);
+                }
+
+
+                $scope.gridOptions.api.setColumnDefs($scope.columnDefs);
+                $scope.gridOptions.api.refreshHeader();
+                $scope.gridOptions.api.setRowData($scope.rowData);
+                $scope.gridOptions.api.refreshView();
+                $scope.gridOptions.api.sizeColumnsToFit();
+
             }
             else {
-                $scope.error = response.data.error;
-                $scope.exception = true;
+                $scope.gotError = true;
+                Flash.create('danger', response.data.error, false);
             }
         });
 
-          for (head in $scope.selected_items) {
-              $scope.columnDefs.push({headersName: head, field: head});
-          }
 
+        $scope.export = function () {
+            $scope.gridOptions.api.exportDataAsCsv();
+        };
 
-    var columnDefs = [
-        {headerName: "Make", field: "make"},
-        {headerName: "Model", field: "model"},
-        {headerName: "Price", field: "price"}
-    ];
-
-
-             var rowData = [
-        {make: "Toyota", model: "Celica", price: 35000},
-        {make: "Ford", model: "Mondeo", price: 32000},
-        {make: "Porsche", model: "Boxter", price: 72000}
-    ];
-
-
-            $scope.gridOptions = {
-        columnDefs: columnDefs,
-        rowData: rowData,
-
-    };
+        $scope.search_now = function () {
+            $scope.gridOptions.api.setQuickFilter($scope.search);
+        };
 
     }]);

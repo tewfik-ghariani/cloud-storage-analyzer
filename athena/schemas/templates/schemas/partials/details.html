@@ -1,48 +1,92 @@
-
-<!--
-<script>
-    $(document).ready(function () {
-        $('#page').fadeIn(2000);
-    });
-
-    // loader shown on details page
-$(function () {
-    $(".preload").fadeOut(2000, function () {
-        $(".postload").fadeIn(1000);
-    });
-});
-
-
-</script>
-
-<div class="preload"><img src="http://i.imgur.com/KUJoe.gif">
+{% include 'schemas/partials/loader.html' %}
+<div class="row">
+    <flash-message></flash-message>
 </div>
--->
-<div ng-show="exception" class="alert alert-danger"> [[error]]</div>
+<div ng-show="arrived" class="postload">
 
-<div ag-grid="gridOptions" class="col-md-8-offset ag-fresh">
+    <button class="btn btn-xs btn-info" data-toggle="modal" data-target="#helpModal">
+        <i class="glyphicon glyphicon-text-background"></i> Help
+    </button>
 
-    <section id="result" >
+    {#  ---------------------------------- Start Help Modal ----------------------------------  #}
 
-        <div class="table-responsive">
-            <table class="table">
+    <div id="helpModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Help</h4>
+                </div>
+                <div class="modal-body">
 
-                <thead>
-                <tr>
+                    <div class="alert alert-info">
+                        The results of the query are shown in the grid.
+                        <br>
+                        You may perform several actions such as:
+                        <ul>
+                            <li> Filter a single column using:
+                                <ul type="circle">
+                                    <li>Equals</li>
+                                    <li>Not Equal</li>
+                                    <li>Starts with</li>
+                                    <li>Ends with</li>
+                                    <li>Contains</li>
+                                    <li>Not contains</li>
+                                </ul>
+                            </li>
+                            <li> Search the whole grid</li>
+                            <li> Resize the columns</li>
+                            <li> Sort the columns (ascending/descending order)</li>
+                            <li> Move the columns</li>
+                            <li> Export as CSV</li>
+                        </ul>
 
-                    <td ng-repeat="head in selected_items"><h3>[[ head ]] </h3></td>
+                    </div>
+                </div>
+                <div class="modal-footer">
 
-                </tr>
-                </thead>
-                <tbody>
-                <tr ng-repeat="row in content">
-                    <td ng-repeat="cell in row"> [[cell]]</td>
-                </tr>
-                </tbody>
-            </table>
+                    <button type="button" class="btn btn-xs btn-default" data-dismiss="modal">
+                        Close
+                    </button>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    {#  ---------------------------------- End Help Modal ----------------------------------  #}
+
+    <div class="row">
+        <div class="col-md-5">
+            <div class="input-group ">
+
+
+                <input class="form-control"
+                       type="text"
+                       ng-model="search"
+                       placeholder="Search"/>
+                <div class="input-group-btn">
+                    <button class="btn btn-md btn-default"
+                            ng-click="search_now()"
+                            type="button">
+                        <i class="glyphicon glyphicon-filter"></i>
+                    </button>
+                </div>
+            </div>
         </div>
 
 
-    </section>
+        <button class="btn btn-default btn-xs fa-pull-right"
+                ng-click="export()">
+            Export as CSV <i class="glyphicon glyphicon-export"></i>
+        </button>
 
+    </div>
+
+    <div class=" row">
+
+        <div ag-grid="gridOptions" id="gridId" class="col-md-8-offset ag-fresh"></div>
+
+    </div>
 </div>

@@ -37,10 +37,21 @@ app.config([
                     customer: null,
                     object: null,
                     headers: null,
-                    conditions: null
+                    conditions: null,
+                    custom: false
                 },
                 templateUrl: 'details',
                 controller: 'detailsController'
+            })
+
+            .state('FDV', {
+                url: '/FDV',
+                params: {
+                    customer: null,
+                    object: null
+                },
+                templateUrl: 'FDV',
+                controller: 'FDVController'
             });
 
 

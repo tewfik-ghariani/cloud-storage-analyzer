@@ -15,7 +15,6 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
 
@@ -26,7 +25,6 @@ SECRET_KEY = 'sv@ah$i@6-8i=e^wt8h+n0hwb-)h^_#f^%lpkur&0p1ew&^f)0'
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -73,22 +71,19 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'athena.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2', #'django.db.backends.postgresql',
-        'NAME': 'athena_db',   # DataBase name
-        'USER': 'si_aps',     
-        'PASSWORD': 'strongpwd4si_aps',       
-        'HOST': 'localhost',        
-        'PORT': '', 
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',  # 'django.db.backends.postgresql',
+        'NAME': 'athena_db',  # DataBase name
+        'USER': 'si_aps',
+        'PASSWORD': 'strongpwd4si_aps',
+        'HOST': 'localhost',
+        'PORT': '',
     },
 }
-
-
 
 # Password validation
 # https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators
@@ -108,7 +103,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/1.10/topics/i18n/
 
@@ -122,19 +116,16 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
 STATIC_URL = '/static/'
-
 
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     'djangobower.finders.BowerFinder',
 )
-
 
 BOWER_COMPONENTS_ROOT = os.path.join(BASE_DIR, 'components')
 
@@ -152,16 +143,14 @@ BOWER_INSTALLED_APPS = (
     'angular-ui-router#0.4.2',
     'checklist-model#0.11.0',
     'ag-grid#9.0.4',
-
 )
 
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, "static"),
 )
 
-LOGIN_URL='/user/login'
-LOGIN_REDIRECT_URL='/'
-
+LOGIN_URL = '/user/login'
+LOGIN_REDIRECT_URL = '/'
 
 EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = 'herpakaapp@gmail.com'

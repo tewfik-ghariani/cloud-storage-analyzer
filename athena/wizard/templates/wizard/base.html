@@ -23,9 +23,9 @@
 
 
         <ul class="nav navbar-nav">
-            <li><a href="{% url 'wizard' %}"><i class="fa fa-home"></i></a></li>
-            <li><a href="{% url 'welcome' %}"> View the Site </a></li>
+            <li><a href="{% url 'welcome' %}"><i class="fa fa-home"></i></a></li>
             <li><a href="{% url 'console' %}"> Console </a></li>
+            <li><a href="{% url 'database' %}"> Database </a></li>
             <li><a href="{% url 'admin:index' %}"> Admin </a></li>
             <li><a href="{% url 'external' %}"> Bucket </a></li>
         </ul>
@@ -88,6 +88,9 @@
     <!---------------------------------- AngularJS -------------------------->
     <script type="text/javascript" src="{% static 'angular/angular.min.js' %}"></script>
 
+    <!-- ag-grid -->
+    <script type="text/javascript" src="{% static 'ag-grid/dist/ag-grid.min.js' %}"></script>
+
     <!-- angular-animate -->
     <script type="text/javascript" src="{% static 'angular-animate/angular-animate.min.js' %}"></script>
 
@@ -103,15 +106,13 @@
 
     <!-- custom -->
     <script type="text/javascript" src="{% static 'wizard/js/app.js' %}"></script>
+    <script type="text/javascript" src="{% static 'wizard/js/angular/controllers/databaseController.js' %}"></script>
     <script type="text/javascript" src="{% static 'wizard/js/angular/controllers/consoleController.js' %}"></script>
     <script type="text/javascript" src="{% static 'wizard/js/angular/controllers/externalController.js' %}"></script>
     <script type="text/javascript" src="{% static 'wizard/js/angular/services.js' %}"></script>
 
     <!-- custom css -->
     <link rel="stylesheet" href="{% static 'wizard/css/style.css' %}"/>
-    <!-- main js -->
-    <script type="text/javascript" src="{% static 'wizard/js/main.js' %}"></script>
-
 
 </div>
 </body>

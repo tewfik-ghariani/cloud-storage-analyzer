@@ -40,9 +40,7 @@ app.factory('listFactory', ['$http', function ($http) {
                     'customer': customer
                 }
             })
-        },
-
-
+        }
     }
 }]);
 
@@ -60,7 +58,7 @@ app.factory('configFactory', ['$http', function ($http) {
                     'object': object
                 }
             })
-        },
+        }
     }
 }]);
 
@@ -69,7 +67,7 @@ app.factory('detailsFactory', ['$http', function ($http) {
 
     return {
 
-        query: function (customer, object, headers, conditions) {
+        query: function (customer, object, headers, conditions, custom=false) {
             return $http({
                 method: 'POST',
                 url: '/details/',
@@ -78,10 +76,23 @@ app.factory('detailsFactory', ['$http', function ($http) {
                     'customer': customer,
                     'object': object,
                     'headers': headers,
-                    'conditions': conditions
+                    'conditions': conditions,
+                    'custom': custom
                 }
             })
         },
+
+        FDVcheck: function (customer, object) {
+            return $http({
+                method: 'POST',
+                url: '/FDV/',
+                data: {
+                    'fetch': 'FDVcheck',
+                    'customer': customer,
+                    'object': object
+                }
+            })
+        }
     }
 
 }]);

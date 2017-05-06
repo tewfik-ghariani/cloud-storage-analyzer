@@ -29,7 +29,7 @@
             <div id="purgeModal" class="modal fade" role="dialog">
                 <div class="modal-dialog">
 
-                    <!-- Modal content-->
+
                     <div class="modal-content">
                         <div class="modal-header">
                             <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -56,53 +56,54 @@
             </div>
 
             {#  ---------------------------------- End Modal ----------------------------------  #}
-
-
-            <div class="row">
-                <input type="button" class="btn btn-danger btn-xs pull-right"
-                       data-target="#purgeModal" value="Purge"
-                       data-toggle="modal"/>
-            </div>
-            <br>
-            <div class="list-group">
-
-                {% if not_front %}
-                    <a class="list-group-item">
-                        <input class="btn btn-md btn-primary" name="back" type="submit" value="..">
-                        <input type="hidden" value="{{ Parent }}" name="Parent"/>
-                        <span class="badge"> {{ Parent }} </span>
-                    </a>
-                {% endif %}
-
-                {% for PRE in folders %}
-                    <a class="list-group-item">
-                        <input class="btn btn-md btn-info" name="prefix" type="submit" value="{{ PRE }}"/>
-                    </a>
-                {% endfor %}
-
-
-
-                {% for bucket in data %}
-                    <a class="list-group-item">
-                        {{ bucket }}
-
-                        <button type="button" ng-click="download($event)" name="download" value="{{ bucket }}"
-                                class="btn btn-xs btn-default pull-right">
-                            <span> Download  <i class="glyphicon glyphicon-download"> </i> </span>
-                        </button>
-
-
-                        <button type="button" ng-click="delete($event)" name="delete" value="{{ bucket }}"
-                                class="btn btn-xs btn-default pull-right">
-                            <span class="badge"> Delete </span>
-                        </button>
-                    </a>
-                {% endfor %}
-
-            </div>
-
         </form>
-    </div>
 
+        <div class="row">
+            <input type="button" class="btn btn-danger btn-xs pull-right"
+                   data-target="#purgeModal" value="Purge"
+                   data-toggle="modal"/>
+        </div>
+        <br>
+        <div class="list-group">
+
+
+            <a ng-show="front" class="list-group-item">
+                <button class="btn btn-md btn-primary"
+                        ng-click="navigate()"
+                        type="button"
+                        value="..">..
+                </button>
+                <span class="badge"> [[ prefix ]] </span>
+            </a>
+
+            <a ng-repeat="PRE in folders" class="list-group-item">
+                <input ng-click="navigate($event)"
+                       class="btn btn-md btn-info"
+                       name="prefix"
+                       type="submit"
+                       value="[[ PRE ]]"/>
+            </a>
+
+
+            <a ng-repeat="object in objects" class="list-group-item">
+                <button type="button"
+                        ng-click="download($event)"
+                        value="[[object]]"
+                        name="download"
+                        class="btn btn-xs btn-default ">
+                    <i class="glyphicon glyphicon-download"> </i>
+                </button>
+                [[object]]
+
+                <button type="button"
+                        ng-click="delete($event, $index)"
+                        name="delete"
+                        value="[[ object ]]"
+                        class="btn btn-xs btn-default pull-right">
+                    <span class="badge"> Delete </span>
+                </button>
+            </a>
+        </div>
+    </div>
 
 {% endblock %}

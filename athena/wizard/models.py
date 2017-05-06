@@ -21,27 +21,23 @@ TYPES = (
     ('public', 'public'),
 )
 
+
 class s3Info(models.Model):
     label = models.CharField(max_length=50)
     shortcut = models.CharField(max_length=20)
     bucket_name = models.CharField(max_length=50, unique=True)
-    bucket_region = models.CharField(max_length= 20, choices = AWS_REGIONS)
-    type = models.CharField(max_length=10, choices= TYPES)
+    bucket_region = models.CharField(max_length=20, choices=AWS_REGIONS)
+    type = models.CharField(max_length=10, choices=TYPES)
 
     def __str__(self):
         return self.label
-
 
 
 class configObject(models.Model):
     name = models.CharField(max_length=50)
     customer = models.ForeignKey(s3Info)
     headers = JSONField()
+    fieldsFDV = JSONField()
 
     def __str__(self):
-        return self.name + ' in ' + self.customer.shortcut
-
-
-
-
-
+        return self.name + ' in ' + self.customer.label

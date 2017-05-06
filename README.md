@@ -46,7 +46,7 @@ $ source venv/bin/activate
 > PostgreSQL 9.4 version is mandatory since the application uses the JsonB object type.
 
 ```sh
-$ apt-get install postgresql-9.4
+$ sudo apt-get install postgresql-9.4
 $ sudo su - postgres
 $ psql
 ```

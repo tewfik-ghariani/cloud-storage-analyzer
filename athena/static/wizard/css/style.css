@@ -3,6 +3,7 @@
     background-color: #ffffff;
     border-color: #d2d2d2;
 }
+
 .navbar-default .navbar-nav > li > a {
     font-size: 14px;
     color: #000000;
@@ -13,3 +14,14 @@
     color: #c4dce8;
 }
 
+
+
+.glyphicon.glyphicon-trash {
+    margin-bottom: 5px;
+    margin-top: 5px;
+    font-size: 15px;
+}
+
+#gridDB {
+    height: 500px !important;
+}

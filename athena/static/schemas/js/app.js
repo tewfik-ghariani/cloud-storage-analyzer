@@ -16,7 +16,7 @@ app.config(function ($interpolateProvider) {
 
 
 app.run(['$rootScope', 'ngProgressFactory', '$http',
-    function ($rootScope, ngProgressFactory, $http ) {
+    function ($rootScope, ngProgressFactory, $http) {
 
         $http.defaults.xsrfHeaderName = 'X-CSRFToken';
         $http.defaults.xsrfCookieName = 'csrftoken';

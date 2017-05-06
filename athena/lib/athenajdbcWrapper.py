@@ -1,9 +1,9 @@
 import os
 import pyathenajdbc
-import re
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 log_path = BASE_DIR + "/lib/static/queries.log"
+
 
 class PyAthenaLoader():
     def connecti(self):
@@ -21,7 +21,6 @@ class PyAthenaLoader():
         tables = self.query("show tables in {0};".format(database))
         return tables
 
-
     def db_manip(self, database, bool):
         self.connecti()
         if bool:
@@ -34,42 +33,40 @@ class PyAthenaLoader():
             with self.conn.cursor() as cursor:
                 cursor.execute(query)
         except Exception as X:
-                return X
+            return {'success': False, 'error': X.args[0]}
         finally:
             self.conn.close()
-        return True
+        return {'success': True}
 
-    def create(self, database, table, cols, types, delim, location):
+    def create(self, columns, delim, database, table):
         self.connecti()
-        create_q = "CREATE EXTERNAL TABLE IF NOT EXISTS {0}.{1} (".format(database, table)
-        columns = ""
-
-        for i in range(len(cols)):
-            if re.match(r'Select', types[i]):
-                types[i] = "string"
-            one_col = " {0} {1}, ".format(cols[i], types[i])
-            columns += one_col
-
-        columns = columns[:-2]
-        create_q += columns
-        create_q += """)
-                    ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe'
-                    WITH SERDEPROPERTIES (
-                        'serialization.format' = '{0}',
-                        'field.delim' = '{0}',
-                        'collection.delimm' = 'undefined',
-                        'mapkey.delim' = 'undefined'
-                    ) LOCATION '{1}';
-                """.format(delim, location)
-
         try:
+            create_q = "CREATE EXTERNAL TABLE IF NOT EXISTS {0}.{1} (".format(database, table)
+
+            for col in columns:
+                # toDo verify type
+                create_q += " {0} {1}, ".format(col['attr'], col['type'])
+            create_q = create_q[:-2]
+
+            create_q += """)
+                        ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe'
+                        WITH SERDEPROPERTIES (
+                            'serialization.format' = '{0}',
+                            'field.delim' = '{0}',
+                            'collection.delimm' = 'undefined',
+                            'mapkey.delim' = 'undefined'
+                        ) LOCATION '""".format(delim)
+
+            slocation = "s3://athena-internship"
+            create_q += "{0}/tmp/{1}/{2}/';".format(slocation, database, table)
+
             with self.conn.cursor() as cursor:
                 cursor.execute(create_q)
         except Exception as X:
-                return X
+            return {'success': False, 'error': X.args[0]}
         finally:
             self.conn.close()
-        return True
+        return {'success': True}
 
     """
     def detect(self,table):
@@ -88,12 +85,34 @@ class PyAthenaLoader():
                 cursor.execute(req)
                 res = cursor.fetchall()
         except Exception as X:
-            return X
+            return {'success': False, 'error': X.args[0]}
         finally:
             self.conn.close()
-        return res
+        return {'success': True, 'data': res}
 
-    # def detect(self, res):
+    def checkFDV(self, fieldsFDV, customer, table):
+        fetchQuery = "SELECT * from {0}.{1} ; ".format(customer, table)
+        fileContent = self.query(fetchQuery)
+        if not fileContent['success']:
+            return fileContent
+
+        try:
+            content = fileContent['data']
+            content = content[1:]
+            print(content)
+
+            # for set in fieldsFDV:
+
+            set = fieldsFDV[0]
+            primary_keys = set['headers']
+            headers = ','.join(primary_keys)
+            unique = set['unique']
+
+
+
+        except Exception as X:
+            return {'success': False, 'error': X.args[0]}
+        return {'success': True, 'data': 'All Good'}
 
     def desc(self, table):
         """
@@ -124,14 +143,13 @@ class PyAthenaLoader():
         print(pyathenajdbc.__athena_driver_version__)
         print('________________')
         print(pyathenajdbc.ATHENA_CONNECTION_STRING)
-        # print(pyathenajdbc.__doc__)
-        # print(pyathenajdbc.__loader__)
+
         dic = pyathenajdbc.__dict__
 
         res = []
         for i in dir(pyathenajdbc):
             temp = i + ' = ' + str(dic[i])
-            # print(temp)
+
             res.append(temp)
 
         return res

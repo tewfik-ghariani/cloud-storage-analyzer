@@ -1,5 +1,8 @@
 <div class="row">
+    <flash-message></flash-message>
+</div>
 
+<div ng-show="arrived" class="row">
 
     <button class="btn btn-xs" data-toggle="collapse" data-target="#custom_query">
         <i class="glyphicon glyphicon-text-size"></i> Custom Query
@@ -8,21 +11,25 @@
 
     <div id="custom_query" class="collapse well">
         <br>
-        <form action="{% url 'details' %}" method="post">
+        <form ng-submit="custom_query()">
             {% csrf_token %}
 
             <div class="row">
                 <div class="form-group">
                     <div class="row">
                         <div class="col-md-2">
-                            <label for="select"> Columns </label>
+                            <label for="custom_query_cols"> Columns </label>
                         </div>
                         <div class="col-md-10">
-                            <input id="select"
-                                   name="select"
-                                   value="SELECT *"
-                                   class="form-control"
-                                   type="text"/>
+                            <div class="input-group">
+                                <span class="input-group-addon">SELECT</span>
+                                <input id="custom_query_cols"
+                                       ng-model="custom_query_cols"
+                                       placeholder="*"
+                                       class="form-control"
+                                       required
+                                       type="text"/>
+                            </div>
                         </div>
                     </div>
 
@@ -45,16 +52,21 @@
 
                     <div class="row">
                         <div class="col-md-2">
-                            <label for="conds"> Conditions </label>
+                            <label for="custom_query_conds"> Conditions </label>
                         </div>
                         <div class="col-md-10">
-                            <textarea id="conds" name="conds" class="form-control">WHERE </textarea>
+                            <div class="input-group">
+                            <textarea id="custom_query_conds"
+                                      placeholder="WHERE"
+                                      ng-model="custom_query_conds"
+                                      class="form-control"></textarea>
+                                <span class="input-group-addon">;</span>
+                            </div>
 
                         </div>
 
                     </div>
-
-                    <button type="submit" name="custom_submit" class="btn btn-warning btn-md pull-right">
+                    <button type="submit" class="btn btn-warning btn-md pull-right">
                         Submit
                     </button>
                 </div>
@@ -65,6 +77,42 @@
     </div>
 
 
+    {#  ---------------------------------- Start FDV Modal ----------------------------------  #}
+    <form ng-submit="FDVcheck()">
+        {% csrf_token %}
+        <div id="ModalFDV" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+
+
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Confirmation</h4>
+                    </div>
+                    <div class="modal-body">
+
+                        You are about to check for FDVs in the file [[ object ]] with the bucket :
+                        <span class="label label-warning"> [[ bucket ]] </span>
+                        <br>
+                        Are you certain? This operation is <u>not free</u> & may take a <u>while</u>
+
+                    </div>
+                    <div class="modal-footer">
+
+                        <button type="button" class="btn btn-xs btn-default" data-dismiss="modal">
+                            Close
+                        </button>
+                        <input class="btn btn-xs btn-danger"
+                               type="submit"
+                               value="Submit"/>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </form>
+    {#  ---------------------------------- End FDV Modal ----------------------------------  #}
+
     <form ng-submit="query()">
         {% csrf_token %}
 
@@ -74,7 +122,7 @@
         <div id="myModal" class="modal fade" role="dialog">
             <div class="modal-dialog">
 
-                <!-- Modal content-->
+
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -91,7 +139,9 @@
                         <button type="button" class="btn btn-xs btn-default" data-dismiss="modal">
                             Close
                         </button>
-                        <input class="btn btn-xs btn-danger" type="submit" value="Submit"/>
+                        <input class="btn btn-xs btn-danger"
+                               type="submit"
+                               value="Submit"/>
                     </div>
                 </div>
 
@@ -121,8 +171,8 @@
                             class="form-control">
 
                         <option ng-repeat="champ in headers" ng-if="champ.html_type == 'number' "
-                                value="[[ champ.attribute ]]">
-                            [[ champ.attribute ]]
+                                value="[[ champ.attr ]]">
+                            [[ champ.attr ]]
                         </option>
 
                     </select>
@@ -147,12 +197,12 @@
 
 
                             <div ng-repeat="champ in headers">
-                                <label class="btn btn-toggle" for="[[ champ.attribute ]]">
+                                <label class="btn btn-toggle" for="[[ champ.attr ]]">
                                     <input type="checkbox"
-                                           id="[[ champ.attribute ]]"
-                                           checklist-value="champ.attribute"
+                                           id="[[ champ.attr ]]"
+                                           checklist-value="champ.attr"
                                            checklist-model="user.headers"
-                                           value="[[ champ.attribute ]]"> [[ champ.attribute ]]
+                                           value="[[ champ.attr ]]"> [[ champ.attr ]]
                                 </label>
                             </div>
 
@@ -168,11 +218,14 @@
             <h3 class="help-block"> Would you like to submit some conditions? </h3>
 
 
-            <div class="alert alert-info"> Using "LIKE" && "NOT LIKE" with text input
+            <div class="alert alert-info fade in">
+                <a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>
+                Using "LIKE" && "NOT LIKE" with text input
                 <ul>
                     <li> % &emsp; The percent sign represents zero, one, or multiple characters</li>
                     <li> _ &emsp; The underscore represents a single character</li>
                 </ul>
+
             </div>
             <hr>
 
@@ -180,18 +233,31 @@
 
                 <div class="row">
 
-                    <div class="col-md-4">
+                    <div class="col-md-2">
+                        <label for="logical"> Clause </label>
+                        <select id="logical"
+                                ng-model="cond.logical"
+                                class="form-control" required>
+                            <option value="AND">AND</option>
+                            <option value="OR">OR</option>
+                            <option value="AND NOT">AND NOT</option>
+                            <option value="OR NOT">OR NOT</option>
+                        </select>
+
+                    </div>
+
+                    <div class="col-md-3">
                         <label for="columns"> Select a column </label>
                         <select id="columns"
                                 ng-model="cond.selected_column"
-                                ng-options="champ.attribute for champ in headers track by champ.attribute"
+                                ng-options="champ.attr for champ in headers track by champ.attr"
                                 class="form-control" required>
                         </select>
 
                     </div>
 
                     <div class="col-md-2">
-                        <label for="types"> Type </label>
+                        <label for="types"> Operator </label>
                         <select id="types"
                                 ng-model="cond.operator"
                                 ng-options="type for type in getOptions(cond.selected_column.html_type)"
@@ -200,12 +266,13 @@
                     </div>
 
 
-                    <div class="col-md-5">
-                        <label for="inputs"> Type your input </label>
+                    <div class="col-md-4">
+                        <label for="inputs"> Enter your input </label>
                         <input id="inputs"
                                ng-model="cond.input"
                                type="[[ cond.selected_column.html_type ]]"
-                               class="form-control" required
+                               class="form-control"
+                               required
                                placeholder="[[ cond.selected_column.type ]]"/>
                     </div>
                     <div class="col-md-1">
@@ -229,7 +296,17 @@
                     class="btn btn-danger btn-xs"
                     data-toggle="modal"
                     data-target="#myModal">
+
                 Submit
+            </button>
+
+            OR
+
+            <button type="button"
+                    class="btn btn-danger btn-xs"
+                    data-toggle="modal"
+                    data-target="#ModalFDV">
+                Verify FDV
             </button>
 
 

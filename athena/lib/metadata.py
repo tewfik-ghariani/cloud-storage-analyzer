@@ -1,86 +1,36 @@
 from django.shortcuts import get_object_or_404
-from schemas.models import testSchema
-from schemas.models_dir import thd
 from wizard.models import s3Info
+from wizard.models import configObject
 import re
 
 
+def findName(names, key):
+    i = 0
+    regex = r".*" + re.escape(names[i]) + r".*"
+    while not re.search(regex, key, re.IGNORECASE):
+        i += 1
+        regex = r".*" + re.escape(names[i]) + r".*"
+    return names[i]
+
+
 def get_config(customer, key):
-    headers = None
-    table = None
-    if re.match(r'^thd', customer):
-        if re.match(r'.*sales.*', key):
-            headers = thd.thdSales.objects.all()
-            table = 'thd.sales'
-        if re.match(r'.*receipts.*', key):
-            headers = thd.thdReceipts.objects.all()
-            table = 'thd.receipts'
-        if re.match(r'.*AUTH$', key):
-            headers = thd.thdAUTH.objects.all()
-            table = 'thd.AUTH'
-        if re.match(r'.*CATM$', key):
-            headers = thd.thdCATM.objects.all()
-            table = 'thd.CATM'
-        if re.match(r'.*CATR$', key):
-            headers = thd.thdCATR.objects.all()
-            table = 'thd.CATR'
-        if re.match(r'.*CLST$', key):
-            headers = thd.thdCLST.objects.all()
-            table = 'thd.CLST'
-        if re.match(r'.*LOCH$', key):
-            headers = thd.thdLOCH.objects.all()
-            table = 'thd.LOCH'
-        if re.match(r'.*PGAD$', key):
-            headers = thd.thdPGAD.objects.all()
-            table = 'thd.PGAD'
-        if re.match(r'.*PGHD$', key):
-            headers = thd.thdPGHD.objects.all()
-            table = 'thd.PGHD'
-        if re.match(r'.*PGSR$', key):
-            headers = thd.thdPGSR.objects.all()
-            table = 'thd.PGSR'
-        if re.match(r'.*PRDH$', key):
-            headers = thd.thdPRDH.objects.all()
-            table = 'thd.PRDH'
-        if re.match(r'.*PSPC$', key):
-            headers = thd.thdPSPC.objects.all()
-            table = 'thd.PSPC'
-        if re.match(r'.*PSSD$', key):
-            headers = thd.thdPSSD.objects.all()
-            table = 'thd.PSSD'
-        if re.match(r'.*SKUA$', key):
-            headers = thd.thdSKUA.objects.all()
-            table = 'thd.SKUA'
-        if re.match(r'.*SKUM$', key):
-            headers = thd.thdSKUM.objects.all()
-            table = 'thd.SKUM'
-        if re.match(r'.*STRM$', key):
-            headers = thd.thdSTRM.objects.all()
-            table = 'thd.STRM'
-        if re.match(r'.*STRT$', key):
-            headers = thd.thdSTRT.objects.all()
-            table = 'thd.STRT'
-        if re.match(r'.*UDSG$', key):
-            headers = thd.thdUDSG.objects.all()
-            table = 'thd.UDSG'
-        if re.match(r'.*UDSV$', key):
-            headers = thd.thdUDSV.objects.all()
-            table = 'thd.UDSV'
+    try:
+        customer = s3Info.objects.get(shortcut=customer)
+        names = configObject.objects.filter(customer=customer).values()
+        f = lambda x: x['name']
+        names = [f(name) for name in names]
+        name = findName(names, key)
+        config = configObject.objects.get(customer=customer, name=name)
+    except Exception as X:
+        print(X.args[0])
+        return {'success': False, 'error': 'Configuration not set yet! Contact the admin!'}
 
-    if re.match(r'^athena$', customer):
-        if re.match(r'.*sales.*', key):
-            headers = testSchema.objects.all().values()
-            table = 'shadow.sales'
-
-    if headers:
-        #convert queryset object to a list
-        obj = []
-        for val in headers:
-            obj.append(val)
-        headers = obj
-
-
-    return headers, table
+    table = config.name
+    headers = config.headers
+    fieldsFDV = config.fieldsFDV
+    return {'success': True, 'data': {'headers': headers,
+                                      'table': table,
+                                      'fieldsFDV': fieldsFDV}}
 
 
 def s3_verif(customer):
@@ -88,11 +38,59 @@ def s3_verif(customer):
     return infos.bucket_name, infos.bucket_region
 
 
-def get_clients():
+def get_clients(all=False):
     res = []
-    for customer in s3Info.objects.filter(type='public').order_by('label'):
+    if all:
+        objects = s3Info.objects.all()
+    else:
+        objects = s3Info.objects.filter(type='public').order_by('label')
+
+    for customer in objects:
         info = {'label': customer.label,
                 'shortcut': customer.shortcut}
         res.append(info)
 
     return res
+
+
+def addConfig(customer, name, rows, auto=False):
+    try:
+        for col in rows:
+            if col['type'] in ['tinyint',
+                               'smallint',
+                               'int',
+                               'bigint',
+                               'float',
+                               'double',
+                               'timestamp']:
+                col['html_type'] = 'number'
+            else:
+                col['html_type'] = 'text'
+
+        if auto:
+            customer = s3Info.objects.get(shortcut=customer)
+        else:
+            customer = s3Info.objects.get(label=customer['label'], shortcut=customer['shortcut'])
+
+        configObject.objects.create(name=name, customer=customer, headers=rows)
+    except Exception as X:
+        return {'success': False, 'error': X.args[0]}
+
+    return {'success': True}
+
+
+def getAllConfig(customer):
+    try:
+        customer = s3Info.objects.get(label=customer['label'], shortcut=customer['shortcut'])
+        objects = configObject.objects.filter(customer=customer).values()
+    except Exception as X:
+        return {'success': False, 'error': X.args[0]}
+
+    if not objects:
+        return {'success': False, 'error': 'Nothing is configured yet'}
+
+    obj = []
+    for val in objects:
+        obj.append(val)
+    objects = obj
+    return {'success': True, 'data': objects}

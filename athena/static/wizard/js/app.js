@@ -1,4 +1,8 @@
+agGrid.initialiseAgGridWithAngular1(angular);
+
+
 var app = angular.module('wizardApp', [
+    'agGrid',
     'ngProgress',
     'ngAnimate',
     'ngFlash',
@@ -10,13 +14,8 @@ app.config(function ($interpolateProvider) {
 });
 
 
-app.run(['$rootScope', 'ngProgressFactory', '$http', '$location',
-    function ($rootScope, ngProgressFactory, $http, $location) {
-
-
-        $rootScope.switchTo = function (headed) {
-            return $location.url(headed);
-        };
+app.run(['$rootScope', 'ngProgressFactory', '$http',
+    function ($rootScope, ngProgressFactory, $http) {
 
 
         $http.defaults.xsrfHeaderName = 'X-CSRFToken';

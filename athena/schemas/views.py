@@ -1,13 +1,14 @@
 from wsgiref.util import FileWrapper
 from django.contrib.auth.decorators import login_required
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.http import Http404, JsonResponse, HttpResponse
+from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render
 
 import os
 import json
 import re
-from lib import jdbc, boto, metadata
+from lib import athenajdbcWrapper
+from lib import botoWrapper
+from lib import metadata
 
 
 def base(request):
@@ -22,7 +23,7 @@ def index(request):
 
 @login_required
 def second(request):
-    athena = jdbc.PyAthenaLoader()
+    athena = athenajdbcWrapper.PyAthenaLoader()
     res = dir(athena)
     res += athena.info()
     return render(request, 'schemas/second.html', {'data': res})
@@ -36,9 +37,14 @@ def list(request):
         req = json.loads(request.body.decode())
         fetched = req['fetch']
 
-        customer = req['customer']
+        try:
+            customer = req['customer']
+        except KeyError:
+            return JsonResponse({'success': False,
+                                 'error': 'Please choose a customer'})
+
         s3_location, region = metadata.s3_verif(customer)
-        aws = boto.BotoLoader(s3_location, region)
+        aws = botoWrapper.BotoLoader(s3_location, region)
 
         if fetched == 'objects':
             prefix = req['prefix']
@@ -61,8 +67,7 @@ def list(request):
             objects = aws.s3loader(prefix)
 
             return JsonResponse({'success': True,
-                                 'data': {'customer': customer,
-                                          'objects': objects,
+                                 'data': {'objects': objects,
                                           'folders': folders,
                                           'prefix': prefix,
                                           'front': front}
@@ -70,7 +75,14 @@ def list(request):
 
         elif fetched == 'download':
             object = req['object']
-            content_type, content_length, content_disposition = aws.download_from_bucket(object)
+            res_download = aws.download_from_bucket(object)
+            if not res_download['success']:
+                return HttpResponse(status=201)
+            content = res_download['data']
+            content_type = content['content_type']
+            content_length = content['content_length']
+            content_disposition = content['content_disposition']
+
             wrapper = FileWrapper(open(object))
             response = HttpResponse(wrapper, content_type=content_type)
             response['Content-Length'] = content_length
@@ -83,26 +95,10 @@ def list(request):
             regex = req['regex']
             customer = req['customer']
             s3_location, region = metadata.s3_verif(customer)
-            aws = boto.BotoLoader(s3_location, region)
+            aws = botoWrapper.BotoLoader(s3_location, region)
             objects = aws.search(regex)
             return JsonResponse({'success': True,
                                  'data': {'objects': objects}})
-
-    '''paginator = Paginator(data, 20)
-
-    page = request.GET.get('page')
-    try:
-        data = paginator.page(page)
-    except PageNotAnInteger:
-        # page not integer
-        data = paginator.page(1)
-    except EmptyPage:
-        # Out of range
-        data = paginator.page(paginator.num_pages)
-
-    # in case of too many pages
-    data.custom_range = range(max(data.number - 3, 1), min(data.number + 3, data.paginator.num_pages) + 1)
-    '''
 
 
 @login_required
@@ -115,12 +111,19 @@ def config(request):
 
         if fetched == 'configuration':
             customer = req['customer']
-            bucket, region = metadata.s3_verif(customer)
             object = req['object']
-            headers, table = metadata.get_config(customer, object)
-            if not table and not headers:
-                return JsonResponse({'success': False})
+            if not object or not customer:
+                return JsonResponse({'success': False,
+                                     'error': 'Please select an object to query'})
 
+            bucket, region = metadata.s3_verif(customer)
+
+            found_config = metadata.get_config(customer, object)
+
+            if not found_config['success']:
+                return JsonResponse(found_config)
+
+            headers = found_config['data']['headers']
             return JsonResponse({'success': True,
                                  'data': {'headers': headers,
                                           'object': object,
@@ -142,65 +145,103 @@ def details(request):
             object = req['object']
             headers = req['headers']
             conditions = req['conditions']
-
-            all_headers, table = metadata.get_config(customer, object)  # retrieve table name to query in athena
-            bucket, region = metadata.s3_verif(customer)  # retrieve bucket config to connect with boto
-            aws = boto.BotoLoader(bucket, region)  # connect with boto
-
-            copy_status = aws.to_athena(customer, object)  # copy the file to the external bucket
-            if not copy_status:
+            custom = req['custom']
+            if not object or not customer:
                 return JsonResponse({'success': False,
-                                     'error': 'Error in copy'})
+                                     'error': 'Hmm, something is missing..'})
 
-            athena = jdbc.PyAthenaLoader()  # prepare to query with athena
+            # retrieve table name to query in athena
+            found_config = metadata.get_config(customer, object)
+            all_headers = found_config['data']['headers']
+            table = found_config['data']['table']
 
-            # -------------- Handle columns --------------------------
-            selected_items = ','.join(headers)
-            if not selected_items:
-                selected_items = '*'
-                f = lambda x: x['attribute']
-                headers = [f(head) for head in all_headers]
+            # retrieve bucket config to connect with boto
+            bucket, region = metadata.s3_verif(customer)
+            # connect with boto
+            aws = botoWrapper.BotoLoader(bucket, region)
 
-            # -------------- Handle Conditions --------------------------
-            if conditions:
-                conditions_if_exist = "WHERE "
-                for cond in conditions:
-                    conditions_if_exist += "{0} {1} {2} and ".format(cond['selected_column']['attribute'],
-                                                                     cond['operator'],
-                                                                     cond['input'])
-                conditions_if_exist = conditions_if_exist[:-5]  # to delete the last 'and'
+            # copy the file to the external bucket
+            copy_status = aws.to_athena(customer, table, object)
+            if not copy_status['success']:
+                return JsonResponse(copy_status)
+
+            # prepare to query with athena
+            athena = athenajdbcWrapper.PyAthenaLoader()
+
+            # ------------------------------------------------ Custom Query -----------------------------
+            if custom:
+                if re.match(r'^SELECT.*', headers):
+                    head, sep, tail = headers.partition('SELECT')
+                    headers = tail
+
+                selected_items = headers
+                if selected_items == '*':
+                    headers = all_headers
+                else:
+                    headers = [headers]
+                conditions_if_exist = conditions
+                # to escape %
+                if re.search(r'\%', conditions_if_exist):
+                    conditions_if_exist = conditions_if_exist.replace('%', '%%')
+
+
+            # ------------------------------------------------ Normal Query -------------------------
             else:
-                conditions_if_exist = ""
+                # -------------- Handle columns --------------------------
+                selected_items = ','.join(headers)
+                if not selected_items:
+                    selected_items = '*'
+                    f = lambda x: x['attr']
+                    headers = [f(head) for head in all_headers]
+
+                # -------------- Handle Conditions --------------------------
+                if conditions:
+                    conditions_if_exist = "WHERE"
+                    conditions[0]['logical'] = ''
+                    for cond in conditions:
+                        if cond['selected_column']['html_type'] == 'text':
+                            # to escape %
+                            if re.search(r'\%', cond['input']):
+                                cond['input'] = cond['input'].replace('%', '%%')
+                            cond['input'] = "\'{0}\'".format(cond['input'])
+                        conditions_if_exist += " {0} {1} {2} {3} ".format(cond['logical'],
+                                                                          cond['selected_column']['attr'],
+                                                                          cond['operator'],
+                                                                          cond['input'])
+                else:
+                    conditions_if_exist = ""
 
             # -------- ------ Construct the query
-            custom_query = "SELECT {0} from {1} {2} ;".format(selected_items, table, conditions_if_exist)
-            content = athena.query(custom_query)
+            query = "SELECT {0} from {1}.{2} {3} ;".format(selected_items,
+                                                           customer,
+                                                           table,
+                                                           conditions_if_exist)
 
-            is_deleted = aws.delete_from_athena(customer, object)  # delete the file from tmp/
+            res_query = athena.query(query)
+            if not res_query['success']:
+                return JsonResponse(res_query)
+            content = res_query['data']
+
+            # if not conditions_if_exist:
+            #    content = content[1:]  # to delete the header line (problem for extra columns)
+
+            # delete the file from the external bucket
+            is_deleted = aws.delete_from_athena(customer, table, object, auto=True)
+            if is_deleted['success']:
+                msg = ''
+            else:
+                msg = is_deleted['error']
 
             return JsonResponse({'success': True,
                                  'data': {'content': content,
-                                          'selected_items': headers}})
-
-            ### --------------------- Custom Query-----------------------
-            if 'custom_submit' in request.POST:
-                selected_items = request.POST.get('select', '')
-                conditions_if_exist = request.POST.get('conds', '')
-                custom_query = "{0} from {1} {2} ".format(selected_items, table, conditions_if_exist)
-
-                head, sep, tail = selected_items.partition('SELECT ')
-                selected_items = tail
-                if selected_items == '*':
-                    selected_header = headers
-                else:
-                    selected_header = selected_items.split(',')
-
+                                          'headers': headers,
+                                          'msg': msg}})
 
             ### -------------------------CONFIG-----------------------
 
-            # retrieve config toDo : create another function in another module
+            # retrieve config toDo : create another function
             # columns
-            elif 'submit' in request.POST:
+            if 'submit' in request.POST:
                 columns = request.POST.getlist('columns', '')
                 extra_op = request.POST.get('extra_op', '')
                 extra_col = request.POST.get('extra_col', '')
@@ -222,23 +263,66 @@ def details(request):
                         selected_items = "*"
                         selected_header = headers
 
-                        type = champ.html_type
-                        if re.match(r'text', type):
-                            choice = "\'{0}\'".format(choice)
-
-                        condition_to_add = "{0} {1} {2} and ".format(champ.attribute, operator, choice)
+                        condition_to_add = "{0} {1} {2} and ".format(champ.attr, operator, choice)
                         conditions_if_exist += condition_to_add
 
                 conditions_if_exist = conditions_if_exist[:-5]  # to delete the last 'and'
 
                 custom_query = "SELECT {0} from {1} {2} ;".format(selected_items, table, conditions_if_exist)
 
-            res = athena.query(custom_query)
-            data = res
-
-            is_deleted = aws.delete_from_athena(customer, object)  # delete the file from tmp/
-
         return render(request, 'schemas/partials/details.html', {'success': True,
                                                                  'data': data,
                                                                  'query': custom_query,
                                                                  'selected_header': selected_header})
+
+
+@login_required
+def FDV(request):
+    if request.method == 'GET':
+        return render(request, 'schemas/partials/FDV.html')
+
+    if request.method == 'POST':
+        req = json.loads(request.body.decode())
+        fetched = req['fetch']
+
+        if fetched == 'FDVcheck':
+            customer = req['customer']
+            object = req['object']
+            if not object or not customer:
+                return JsonResponse({'success': False,
+                                     'error': 'Hmm, something is missing..'})
+
+            # retrieve table name to query in athena
+            found_config = metadata.get_config(customer, object)
+            fieldsFDV = found_config['data']['fieldsFDV']
+            table = found_config['data']['table']
+
+            # retrieve bucket config to connect with boto
+            bucket, region = metadata.s3_verif(customer)
+            # connect with boto wrapper
+            aws = botoWrapper.BotoLoader(bucket, region)
+
+            # copy the file to the external bucket
+            copy_status = aws.to_athena(customer, table, object)
+            if not copy_status['success']:
+                return JsonResponse(copy_status)
+
+            athena = athenajdbcWrapper.PyAthenaLoader()  # prepare to query with athena
+
+            # -------- ------ FDV detection
+            res_query = athena.checkFDV(fieldsFDV, customer, table)
+            if not res_query['success']:
+                return JsonResponse(res_query)
+
+            content = res_query['data']
+
+            # delete the file from the external bucket
+            is_deleted = aws.delete_from_athena(customer, table, object, auto=True)
+            if is_deleted['success']:
+                msg = ''
+            else:
+                msg = is_deleted['error']
+
+            return JsonResponse({'success': True,
+                                 'data': {'content': content,
+                                          'msg': msg}})

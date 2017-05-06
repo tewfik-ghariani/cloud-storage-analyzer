@@ -51,7 +51,7 @@ app.factory('consoleWizardFactory', ['$http', function ($http) {
             }
         },
 
-        create_db: function (db) {
+        createDB: function (db) {
             return $http({
                 method: 'POST',
                 url: '/wizard/console',
@@ -62,25 +62,92 @@ app.factory('consoleWizardFactory', ['$http', function ($http) {
                 }
             })
         },
+
+        createTable: function (columns, delim, database, table) {
+            return $http({
+                method: 'POST',
+                url: '/wizard/console',
+                data: {
+                    'fetch': 'create_table',
+                    'columns': columns,
+                    'delim': delim,
+                    'database': database,
+                    'table': table
+                }
+            })
+
+        },
     }
 }]);
-
-
-
 
 
 app.factory('externalWizardFactory', ['$http', function ($http) {
 
     return {
-        actionFile: function (file, type) {
+        actionFile: function (file, fetch) {
             return $http({
                 method: 'POST',
                 url: '/wizard/external',
-                data: {'fetch': type,
-                        'file': file}
+                data: {
+                    'fetch': fetch,
+                    'file': file
+                }
             })
         },
 
+        getObjects: function (prefix=null, back=false) {
+            return $http({
+                method: 'POST',
+                url: '/wizard/external',
+                data: {
+                    'fetch': 'objects',
+                    'prefix': prefix,
+                    'back': back
+                }
+            })
+        },
+
+    }
+
+}]);
+
+
+app.factory('databaseWizardFactory', ['$http', function ($http) {
+
+    return {
+        getCustomers: function () {
+            return $http({
+                method: 'POST',
+                url: '/wizard/database',
+                data: {
+                    'fetch': 'customers',
+                }
+            })
+        },
+
+        addConfig: function (customer, name, rows) {
+            return $http({
+                method: 'POST',
+                url: '/wizard/database',
+                data: {
+                    'fetch': 'addConfig',
+                    'customer': customer,
+                    'name': name,
+                    'rows': rows
+                }
+            })
+        },
+
+        getConfig: function(customer) {
+            return $http({
+                method: 'POST',
+                url: '/wizard/database',
+                data: {
+                    'fetch': 'getConfig',
+                    'customer': customer
+                }
+            })
+        },
     }
 
 }]);

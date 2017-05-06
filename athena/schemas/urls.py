@@ -23,5 +23,5 @@ urlpatterns = [
     url(r'^list/$', views.list, name="list"),
     url(r'^config/$', views.config, name="config"),
     url(r'^details/$', views.details, name="details"),
-
+    url(r'^FDV/$', views.FDV, name="FDV"),
 ]

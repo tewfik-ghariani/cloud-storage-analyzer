@@ -5,116 +5,295 @@
 {% block wizard_content %}
 
     <div ng-controller="consoleController">
-        <form action="{% url 'console' %}" method="POST" class="form-inline">
-            {% csrf_token %}
+        {#  ---------------------------------- Start Modal for deletion ----------------------------  #}
 
-            {#  ---------------------------------- Start Modal ----------------------------------  #}
+        <div id="deleteModal" class="modal fade" role="dialog">
+            <div class="modal-dialog">
 
-            <div id="deleteModal" class="modal fade" role="dialog">
-                <div class="modal-dialog">
-
-                    <!-- Modal content-->
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal">&times;</button>
-                            <h4 class="modal-title">Delete?</h4>
-                        </div>
-                        <div class="modal-body">
-
-                            You are about to delete the <span class="label label-danger">[[to_delete]]</span> [[type]]
-
-                        </div>
-                        <div class="modal-footer">
-                            <input ng-click="delete()" class="btn btn-danger btn-xs" value="Delete Now" type="button"/>
-                            <button type="button" class="btn btn-xs btn-default" data-dismiss="modal">Cancel</button>
-
-
-                        </div>
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Delete?</h4>
                     </div>
+                    <div class="modal-body">
 
-                </div>
-            </div>
+                        You are about to delete the <span class="label label-danger">
+                        [[to_delete]]</span> [[type]]
 
-            {#  ---------------------------------- End Modal ----------------------------------  #}
-
-            <flash-message></flash-message>
-
-            <div class="row">
-
-                <div class="form-group">
-                    <button type="button" class="btn btn-primary pull-left" value="dbs" ng-click="dbs()"> Show
-                        Databases
-                    </button>
-
-
-                    <a class="btn btn-xs" data-toggle="collapse" data-target="#new_db">
-                        <i class="glyphicon glyphicon-pencil"></i>
-                    </a>
-                </div>
-
-                <div id="new_db" class="collapse">
-                    <div class="form-group">
-                        <label for="new_database"> New Database </label>
-                        <input id="new_database" name="new_database" ng-model="new_database" class="form-control"
-                               type="text"/>
-                        <button type="button" name="clicked" ng-click="new_db()" class="btn btn-xs btn-success">
-                            <i class="glyphicon glyphicon-floppy-disk"></i>
+                    </div>
+                    <div class="modal-footer">
+                        <input ng-click="delete()"
+                               class="btn btn-danger btn-xs"
+                               value="Delete Now"
+                               type="button"/>
+                        <button type="button"
+                                class="btn btn-xs btn-default"
+                                data-dismiss="modal">
+                            Cancel
                         </button>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        {#  ---------------------------------- End Deletion Modal ----------------------------------  #}
 
 
-                <a href="{% url 'add_table' %}">
-                    <i class="glyphicon glyphicon-plus-sign pull-right"> New Table </i>
-                </a>
+        <flash-message></flash-message>
+
+        <div class="row">
+
+            <div class="form-group">
+                <button type="button"
+                        class="btn btn-primary pull-left"
+                        value="dbs"
+                        ng-click="dbs()">
+                    Show Databases
+                </button>
+
+
+                {# ---------- Trigger the modal for creating database -------------------------  #}
+                <button type="button"
+                        data-toggle="modal"
+                        class="btn btn-md btn-default"
+                        data-target="#newDbModal">
+                    New Database <i class="glyphicon glyphicon-pencil"></i>
+                </button>
+
+            </div>
+
+            {#  ----------------------------------New Database Modal --------------------------- #}
+
+
+            <div id="newDbModal" class="modal fade" role="dialog">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <form ng-submit="new_db()">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                <h4 class="modal-title">Create new database</h4>
+                            </div>
+                            <div class="modal-body">
+
+                                <div class="form-group">
+                                    <label for="new_database"
+                                           class="form-control-label"> Name </label>
+                                    <input id="new_database"
+                                           name="new_database"
+                                           ng-model="new_database"
+                                           class="form-control"
+                                           type="text"/>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="submit"
+                                        class="btn btn-xs btn-success pull-right">
+                                    Create Database <i class="glyphicon glyphicon-floppy-disk"> </i>
+                                </button>
+                                <button type="button"
+                                        class="btn btn-xs btn-default"
+                                        data-dismiss="modal">
+                                    Close
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
 
 
-            <div class="row">
-                <div class="col-md-3">
-                    <div class="list-group" >
+            {# ----------------------------------End new db Modal ---------------------------------- #}
 
-                        <a class="list-group-item" ng-repeat="db in databases">
-                            <input type="button" class="btn btn-default" ng-click="get_tables()" value="[[ db ]]"/>
 
-                            <button type="button" class="btn btn-xs  pull-right" ng-click="associate()"
-                                    data-target="#deleteModal"
-                                    data-toggle="modal" value="[[ db ]]">
-                                <i class="glyphicon glyphicon-remove"></i>
-                            </button>
-                        </a>
+            {# ---------- Trigger the modal for creating table -------------------------  #}
+            <button type="button"
+                    class="btn btn-link pull-right"
+                    ng-click="dbs()"
+                    data-toggle="modal"
+                    data-target="#createModal">
+                <i class="glyphicon glyphicon-plus-sign"> New Table </i>
+            </button>
 
+            {#  ----------------------------------Create table Modal --------------------------- #}
+            <div id="createModal" class="modal fade" role="dialog">
+                <div class="modal-dialog  modal-lg">
+                    <div class="modal-content">
+                        <form ng-submit="createTable()">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                <h4 class="modal-title">Create new table</h4>
+                            </div>
+                            <div class="modal-body container-fluid">
+                                {# -------------------------- Add Table Form -------------- #}
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <div class="input-group">
+                                            <div class="row">
+                                                <div class="col-md-5">
+                                                    <label for="column_attr" class="form-control-label">
+                                                        Column Name </label>
+                                                    <input id="column_attr"
+                                                           class="form-control"
+                                                           ng-model="col_attr"
+                                                           type="text" required/>
+                                                </div>
+
+                                                <div class="col-md-4">
+                                                    <label for="column_type" class="form-control-label">
+                                                        Column Type </label>
+                                                    <select id="column_type"
+                                                            ng-model="col_type"
+                                                            ng-options="type for type in common_types"
+                                                            class="form-control"
+                                                            required>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+                                        <div class="input-group" ng-repeat="col in columns">
+                                            <div class="row">
+                                                <div class="col-md-5">
+                                                    <label for="column_attr" class="form-control-label">
+                                                        Column Name </label>
+                                                    <input id="column_attr"
+                                                           class="form-control"
+                                                           ng-model="col.attr"
+                                                           type="text" required/>
+                                                </div>
+
+                                                <div class="col-md-4">
+                                                    <label for="column_type"
+                                                           class="form-control-label">
+                                                        Column Type </label>
+                                                    <select id="column_type"
+                                                            ng-model="col.type"
+                                                            class="form-control"
+                                                            ng-options="type for type in common_types"
+                                                            required>
+                                                    </select>
+                                                </div>
+
+                                                <div class="col-md-1">
+                                                    <label for="del" class="form-control-label">
+                                                    </label>
+                                                    <button class="btn btn-warning btn-xs"
+                                                            type="button"
+                                                            ng-click="deleteColumn($index)">
+                                                        <i class="glyphicon glyphicon-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+
+
+                                    <div class="col-md-4 well">
+
+                                        <div class="form-group">
+                                            <label for="select_database"
+                                                   class="form-control-label">
+                                                Database </label>
+                                            <select id="select_database"
+                                                    class="form-control"
+                                                    ng-model="selected_db"
+                                                    ng-options="db for db in databases">
+                                            </select>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="table_name"
+                                                   class="form-control-label">
+                                                Table </label>
+                                            <input id="table_name"
+                                                   ng-model="table_name"
+                                                   class="form-control"
+                                                   type="text"
+                                                   required/>
+                                        </div>
+
+
+                                        <div class="form-group">
+                                            <label for="delim"
+                                                   class="form-control-label">
+                                                Delimiter </label>
+                                            <input id="Delim"
+                                                   ng-model="delim"
+                                                   class="form-control"
+                                                   type="text"
+                                                   required/>
+                                        </div>
+                                    </div>
+                                </div>
+                                {# -------------------------- End Add Table Form -------------- #}
+
+                            </div>
+                            <div class="modal-footer">
+
+                                <a class="btn btn-xs btn-link pull-left"
+                                   ng-click="addColumn()">
+                                    <i class="glyphicon glyphicon-plus">Add a column</i></a>
+
+
+                                <button type="submit"
+                                        class="btn btn-xs btn-success pull-right">
+                                    Create Table
+                                </button>
+                                <button type="button"
+                                        class="btn btn-xs btn-default"
+                                        data-dismiss="modal">
+                                    Close
+                                </button>
+                            </div>
+                        </form>
                     </div>
-
                 </div>
+            </div>
 
+            {# ----------------------------------End Creation Modal ---------------------------------- #}
+        </div>
 
-                <div class="col-md-3">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="list-group">
+
+                    <a class="list-group-item" ng-repeat="db in databases">
+                        <input type="button"
+                               class="btn btn-default"
+                               ng-click="get_tables()"
+                               value="[[ db ]]"/>
+
+                        <button type="button" class="btn btn-xs  pull-right" ng-click="associate()"
+                                data-target="#deleteModal"
+                                data-toggle="modal" value="[[ db ]]">
+                            <i class="glyphicon glyphicon-remove"></i>
+                        </button>
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-md-3">
 
                 [[no_tables]]
                 [[parent_db]]
-                    <div class="list-group" >
+                <div class="list-group">
+                    <a class="list-group-item" ng-repeat="table in tables">
+                        [[table]]
+                        <button class="btn btn-xs pull-right" type="button"
+                                data-target="#deleteModal"
+                                data-toggle="modal" ng-click="associate()" value="[[ table ]]">
+                            <i class="glyphicon glyphicon-remove"></i>
+                        </button>
+                    </a>
 
-                        <a class="list-group-item" ng-repeat="table in tables">
-                            [[table]]
-                            <button class="btn btn-xs pull-right" type="button"
-                                    data-target="#deleteModal"
-                                    data-toggle="modal" ng-click="associate()" value="[[ table ]]">
-                                <i class="glyphicon glyphicon-remove"></i>
-                            </button>
-                        </a>
-
-                    </div>
                 </div>
-
-
             </div>
-        </form>
+
+        </div>
+
     </div>
 
 {% endblock %}
-
-
-
-
-

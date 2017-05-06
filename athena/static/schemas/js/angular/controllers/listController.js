@@ -4,25 +4,34 @@ var app = angular.module('schemaApp');
 app.controller('listController', [
     '$scope',
     'Flash',
+    '$rootScope',
     'listFactory',
     '$state',
     function ($scope,
               Flash,
+              $rootScope,
               listFactory,
               $state) {
 
-        var customer = $state.params.customer_shortcut;
+        $rootScope.customer = $state.params.customer_shortcut || $rootScope.customer ;
+        var customer = $rootScope.customer || $scope.customer;
+
+        $scope.arrived = false;
         $scope.progressbar.start();
 
         listFactory.getList(customer).then(function (response) {
+            $scope.progressbar.complete();
+
             if (response.data.success) {
                 data = response.data.data;
                 $scope.folders = data.folders;
-                $scope.customer = data.customer;
                 $scope.objects = data.objects;
                 $scope.prefix = data.prefix;
                 $scope.not_front = data.not_front;
-                $scope.progressbar.complete();
+                $scope.arrived = true;
+            }
+            else {
+                Flash.create('danger', response.data.error, false);
             }
         });
 
@@ -31,7 +40,6 @@ app.controller('listController', [
             var prefix;
             var back = false;
 
-            $scope.progressbar.start();
             if (element) {
                 prefix = element.target.value;
             }
@@ -39,16 +47,20 @@ app.controller('listController', [
                 prefix = $scope.prefix;
                 back = true;
             }
+            $scope.progressbar.start();
 
             listFactory.getList(customer, prefix, back).then(function (response) {
+                $scope.progressbar.complete();
+
                 if (response.data.success) {
                     data = response.data.data;
                     $scope.folders = data.folders;
-                    $scope.customer = data.customer;
                     $scope.objects = data.objects;
                     $scope.prefix = data.prefix;
                     $scope.front = data.front;
-                    $scope.progressbar.complete();
+                }
+                else {
+                    Flash.create('danger', response.data.error, false);
                 }
             });
         };
@@ -65,19 +77,19 @@ app.controller('listController', [
 
         };
 
-        $scope.download = function (element){
-
+        $scope.download = function (element) {
             var object = element.currentTarget.value;
             var customer = $scope.customer;
 
-            $scope.progressbar.start();
             var flash_msg = "<b> Downloading " + object;
-            var info_id = Flash.create('info', flash_msg , 0, false);
+            var info_id = Flash.create('info', flash_msg, 0, false);
+            $scope.progressbar.start();
 
             listFactory.download(customer, object).then(function (response) {
+                $scope.progressbar.complete();
+                Flash.dismiss(info_id);
+
                 if (response.status == 200) {
-                    $scope.progressbar.complete();
-                    Flash.dismiss(info_id);
                     flash_msg = "<b> Success! " + object + " successfully downloaded! ";
                     Flash.create('success', flash_msg);
 
@@ -93,6 +105,9 @@ app.controller('listController', [
 
                     anchor.remove(); // Clean it up afterwards
                 }
+                else if (response.status == 201) {
+                    Flash.create('danger', 'Error in download');
+                }
             });
         };
 
@@ -101,26 +116,29 @@ app.controller('listController', [
             var regex = $scope.regex;
             var customer = $scope.customer;
 
-            $scope.progressbar.start();
             var flash_msg = "<b> Searching for " + regex + " .. This might take a while.. ";
-            var info_id = Flash.create('info', flash_msg , 0, false);
+            var info_id = Flash.create('info', flash_msg, 0, false);
+            $scope.progressbar.start();
 
             listFactory.search(regex, customer).then(function (response) {
-                if (response.data.success)
-                    $scope.progressbar.complete();
-                    Flash.dismiss(info_id);
+                $scope.progressbar.complete();
+                Flash.dismiss(info_id);
+
+                if (response.data.success) {
                     $scope.folders = [];
                     $scope.front = false;
                     data = response.data.data;
                     $scope.objects = data.objects;
                     flash_msg = "<b> Success! Found "
-                                + data.objects.length
-                                + " object(s) that matchs "
-                                + regex;
+                        + data.objects.length
+                        + " object(s) that matchs "
+                        + regex;
                     Flash.create('success', flash_msg);
+                }
+                else {
+                    Flash.create('danger', response.data.error, false);
+                }
             });
-
         };
-
 
     }]);

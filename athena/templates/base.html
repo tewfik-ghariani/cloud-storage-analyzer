@@ -16,7 +16,8 @@
 <nav class="navbar navbar-collapse collapse">
     <div class="container-fluid">
         <div class="navbar-header">
-            <a class="navbar-brand" href="{% url 'welcome' %}"><img src="{% static 'images/infor.png' %}"/> </a>
+            <a class="navbar-brand" href="{% url 'welcome' %}"><img src="{% static 'images/infor.png' %}"/>
+            </a>
 
         </div>
 
@@ -37,7 +38,8 @@
             <ul class="nav navbar-nav navbar-right">
 
                 {% if user.is_authenticated %}
-                    <li><a href="{% url 'logout' %}"> <i class="glyphicon glyphicon-log-out"> Logout </i> </a>
+                    <li><a href="{% url 'logout' %}"> <i class="glyphicon glyphicon-log-out">
+                        Logout </i> </a>
                     </li>
                     <li class="dropdown" id="profile-dropdown">
                         <a class="dropdown-toggle" data-toggle="dropdown" href>
@@ -53,7 +55,8 @@
 
                 {% else %}
 
-                    <li><a href="{% url 'login' %}"> <i class="glyphicon glyphicon-log-in"> Login </i></a></li>
+                    <li><a href="{% url 'login' %}"> <i class="glyphicon glyphicon-log-in">
+                        Login </i></a></li>
                     <li><a href="{% url 'register' %}"> <i class="glyphicon glyphicon-floppy-disk">
                         Register </i></a></li>
                 {% endif %}
@@ -113,7 +116,7 @@
     <!-- main js -->
     <script type="text/javascript" src="{% static 'schemas/js/main.js' %}"></script>
 
-{% block extra_static %}{% endblock %}
+    {% block extra_static %}{% endblock %}
 
 </div>
 </body>
