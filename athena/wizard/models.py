@@ -2,23 +2,23 @@ from django.db import models
 from django.contrib.postgres.fields import JSONField
 
 AWS_REGIONS = (
-    ('us-east-1', 'us-east-1'),
-    ('us-east-2', 'us-east-2'),
-    ('us-west-1', 'us-west-1'),
-    ('us-west-2', 'us-west-2'),
-    ('ap-south-1', 'ap-south-1'),
-    ('ap-northeast-1', 'ap-northeast-1'),
-    ('ap-northeast-2', 'ap-northeast-2'),
-    ('ap-southeast-1', 'ap-southeast-1'),
-    ('ap-southeast-2', 'ap-southeast-2'),
-    ('eu-central-1', 'eu-central-1'),
-    ('eu-west-1', 'eu-west-1'),
-    ('eu-west-2', 'eu-west-2'),
+    ("us-east-1", "us-east-1"),
+    ("us-east-2", "us-east-2"),
+    ("us-west-1", "us-west-1"),
+    ("us-west-2", "us-west-2"),
+    ("ap-south-1", "ap-south-1"),
+    ("ap-northeast-1", "ap-northeast-1"),
+    ("ap-northeast-2", "ap-northeast-2"),
+    ("ap-southeast-1", "ap-southeast-1"),
+    ("ap-southeast-2", "ap-southeast-2"),
+    ("eu-central-1", "eu-central-1"),
+    ("eu-west-1", "eu-west-1"),
+    ("eu-west-2", "eu-west-2"),
 )
 
 TYPES = (
-    ('private', 'private'),
-    ('public', 'public'),
+    ("private", "private"),
+    ("public", "public"),
 )
 
 
@@ -40,4 +40,4 @@ class configObject(models.Model):
     fieldsFDV = JSONField()
 
     def __str__(self):
-        return self.name + ' in ' + self.customer.label
+        return self.name + " in " + self.customer.label

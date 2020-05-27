@@ -1,9 +1,11 @@
 
-Apsinternsproject is the repository that contains all APS interns projects
 
-The is the README related to the Cloud Storage Analyzer project.
+Cloud Storage Analyzer project.
 
 # Description
+
+A web application providing features such as data aggregation, anomalies detection and data inspection of files residing in AWS S3 buckets
+The tool leverages AWS Athena by using its JDBC driver
 
 - Creation 
 01 March 2017
@@ -15,7 +17,7 @@ Tewfik Ghariani
 
 Hi there!
 
-Before starting to use our application, you have to set your environment.
+Before starting to use the application, you have to set your environment.
 Don't worry, you need to follow these steps and you'll be ready!
 
 ### Python 3
@@ -53,7 +55,7 @@ $ psql
 
 ```sql
 CREATE DATABASE athena_db;
-CREATE USER si_aps WITH PASSWORD {% Ask Tewfik %} ;
+CREATE USER si_aps WITH PASSWORD {% _<password>_ %} ;
 ALTER ROLE si_aps SET client_encoding TO 'utf8';
 ALTER ROLE si_aps SET default_transaction_isolation TO 'read committed';
 ALTER ROLE si_aps SET timezone TO 'UTC';
@@ -110,17 +112,6 @@ $ python manage.py migrate
 
 
  ```$ python manage.py collectstatic (Only in prod)```
-
-
-### Cloud Store
-
-
-```sh
-$ wget 'https://bob.logicblox.com/build/1846954/download/1/s3lib-650_18f070b58055436acf36f2c2bc291a03cf00bcce.tgz'
-$ tar zxvf s3lib-650_18f070b58055436acf36f2c2bc291a03cf00bcce.tgz
-$ mv s3lib-650_18f070b58055436acf36f2c2bc291a03cf00bcce/ ~/apsinternsprojects/athena/lib/static/cloud-store/
-```
-
 
 
 # Usage

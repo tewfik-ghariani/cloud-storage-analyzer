@@ -17,11 +17,11 @@ from django.conf.urls import url
 from . import views
 
 urlpatterns = [
-    url(r'^$', views.base, name="welcome"),
-    url(r'^second$', views.second, name="second"),
-    url(r'^index$', views.index, name="index"),
-    url(r'^list/$', views.list, name="list"),
-    url(r'^config/$', views.config, name="config"),
-    url(r'^details/$', views.details, name="details"),
-    url(r'^FDV/$', views.FDV, name="FDV"),
+    url(r"^$", views.base, name="welcome"),
+    url(r"^second$", views.second, name="second"),
+    url(r"^index$", views.index, name="index"),
+    url(r"^list/$", views.list, name="list"),
+    url(r"^config/$", views.config, name="config"),
+    url(r"^details/$", views.details, name="details"),
+    url(r"^FDV/$", views.FDV, name="FDV"),
 ]

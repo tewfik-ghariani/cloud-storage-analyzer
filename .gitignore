@@ -1,8 +1,12 @@
 athena/components
 athena/lib/static
 venv
-athena/.idea
-
 
 syntax: glob
+.idea
+*egg-info
+*.log
+*.txt
 *.pyc
+*.swp
+*.bkp
