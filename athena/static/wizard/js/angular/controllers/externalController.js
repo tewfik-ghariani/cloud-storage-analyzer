@@ -31,7 +31,7 @@ app.controller('externalController', [
             file = element.currentTarget.value;
             fetch = element.currentTarget.name;
 
-            var info_id = Flash.create('danger', "<b> Deleting file.. </b>" + file, 0, false);
+            var info_id = Flash.create('danger', "Deleting file.." + file, 0, false);
             $scope.progressbar.start();
 
             externalWizardFactory.actionFile(file, fetch).then(function (response) {
@@ -52,7 +52,9 @@ app.controller('externalController', [
         $scope.download = function (element) {
             file = element.currentTarget.value;
             fetch = element.currentTarget.name;
-            var info_id = Flash.create('info', "<b> Downloading file.. </b>" + file, 0, false);
+            var info_id = Flash.create('info',
+                "<span class=\'glyphicon glyphicon-refresh glyphicon-refresh-animate\'></span>  Downloading file.. " + file,
+                0, false);
             $scope.progressbar.start();
 
             externalWizardFactory.actionFile(file, fetch).then(function (response) {
@@ -76,7 +78,10 @@ app.controller('externalController', [
 
                 }
                 else if (response.status == 201) {
-                    Flash.create('danger', 'Error in download');
+                    Flash.create('danger', ' Error in download');
+                }
+                else if (response.status == 202) {
+                    Flash.create('danger', ' This object is in the Glacier Storage class');
                 }
             });
         };
@@ -104,6 +109,30 @@ app.controller('externalController', [
                     $scope.objects = data.objects;
                     $scope.prefix = data.prefix;
                     $scope.front = data.front;
+                }
+                else {
+                    Flash.create('danger', response.data.error, false);
+                }
+            });
+        };
+
+        $scope.getSize = function (element) {
+            var object = element.currentTarget.value;
+            var flash_msg = " Retrieving size for " + object;
+            var info_id = Flash.create('info', flash_msg, 0, false);
+            $scope.progressbar.start();
+
+            externalWizardFactory.getSize(object).then(function (response) {
+                $scope.progressbar.complete();
+                Flash.dismiss(info_id);
+
+                if (response.data.success) {
+                    size = response.data.size;
+                    flash_msg = " File "
+                        + object
+                        + " has the size of "
+                        + size;
+                    Flash.create('success', flash_msg);
                 }
                 else {
                     Flash.create('danger', response.data.error, false);

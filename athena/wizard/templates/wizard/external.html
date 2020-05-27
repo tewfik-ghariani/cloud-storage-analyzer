@@ -1,4 +1,4 @@
-{% extends "wizard/base.html" %}
+{% extends "wizard/wizard.html" %}
 
 {% block title %} External Bucket {% endblock %}
 
@@ -13,15 +13,11 @@
     {% endif %}
 
 
-
     <div ng-controller="externalController">
-
 
         <flash-message></flash-message>
 
-
         <form action="{% url 'external' %}" method="POST">
-
             {% csrf_token %}
 
             {#  ---------------------------------- Start Modal ----------------------------------  #}
@@ -36,19 +32,14 @@
                             <h4 class="modal-title">Delete all contents?</h4>
                         </div>
                         <div class="modal-body">
-
                             You are about to purge the external bucket
-
-
                         </div>
                         <div class="modal-footer">
-                            <input name="purge" class="btn btn-danger btn-xs"
-                                   value="Yes, Purge Now" type="submit"/>
                             <button type="button" class="btn btn-xs btn-default"
                                     data-dismiss="modal">Cancel
                             </button>
-
-
+                            <input name="purge" class="btn btn-danger btn-xs"
+                                   value="Yes, Purge Now" type="submit"/>
                         </div>
                     </div>
 
@@ -65,13 +56,11 @@
         </div>
         <br>
         <div class="list-group">
-
-
             <a ng-show="front" class="list-group-item">
                 <button class="btn btn-md btn-primary"
                         ng-click="navigate()"
-                        type="button"
-                        value="..">..
+                        type="button">
+                    <i class="fa fa-arrow-circle-left fa-1x" aria-hidden="true"></i>
                 </button>
                 <span class="badge"> [[ prefix ]] </span>
             </a>
@@ -84,8 +73,11 @@
                        value="[[ PRE ]]"/>
             </a>
 
-
             <a ng-repeat="object in objects" class="list-group-item">
+                <button type="button" ng-click="getSize($event)" value="[[object]]"
+                        class="btn btn-xs btn-info">
+                    <i class="glyphicon glyphicon-info-sign"></i>
+                </button>
                 <button type="button"
                         ng-click="download($event)"
                         value="[[object]]"

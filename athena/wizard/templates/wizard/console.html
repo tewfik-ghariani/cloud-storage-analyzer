@@ -1,4 +1,4 @@
-{% extends "wizard/base.html" %}
+{% extends "wizard/wizard.html" %}
 
 {% block title %} Console {% endblock %}
 
@@ -82,6 +82,7 @@
                                            name="new_database"
                                            ng-model="new_database"
                                            class="form-control"
+                                           required
                                            type="text"/>
                                 </div>
                             </div>
@@ -121,7 +122,7 @@
                         <form ng-submit="createTable()">
                             <div class="modal-header">
                                 <button type="button" class="close" data-dismiss="modal">&times;</button>
-                                <h4 class="modal-title">Create new table</h4>
+                                <h4 class="modal-title">Create new table : Athena Catalog and Local Database</h4>
                             </div>
                             <div class="modal-body container-fluid">
                                 {# -------------------------- Add Table Form -------------- #}
@@ -142,6 +143,7 @@
                                                     <label for="column_type" class="form-control-label">
                                                         Column Type </label>
                                                     <select id="column_type"
+                                                            name="column_type"
                                                             ng-model="col_type"
                                                             ng-options="type for type in common_types"
                                                             class="form-control"
@@ -281,7 +283,10 @@
                 [[parent_db]]
                 <div class="list-group">
                     <a class="list-group-item" ng-repeat="table in tables">
-                        [[table]]
+                        <input type="button"
+                               class="btn btn-default"
+                               ng-click="desc_table(table)"
+                               value="[[ table ]]"/>
                         <button class="btn btn-xs pull-right" type="button"
                                 data-target="#deleteModal"
                                 data-toggle="modal" ng-click="associate()" value="[[ table ]]">
@@ -289,6 +294,13 @@
                         </button>
                     </a>
 
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="list-group">
+                    <a class="list-group-item" ng-repeat="des in desc">
+                        [[des]]
+                    </a>
                 </div>
             </div>
 

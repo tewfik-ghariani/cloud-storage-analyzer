@@ -33,12 +33,13 @@ app.controller('consoleController', [
             'timestamp'
         ];
 
-        var done = "<b> Success!</b>";
+        var done = "<u>Success!</u>";
 
 
         $scope.dbs = function () {
-            var info_id = Flash.create('info', "<b> Retrieving Databases.. </b>", 0, false);
+            var info_id = Flash.create('info', "Retrieving Databases.. ", 0, false);
             $scope.tables = [];
+            $scope.desc = [];
             $scope.no_tables = null;
             $scope.parent_db = null;
             $scope.progressbar.start();
@@ -63,8 +64,9 @@ app.controller('consoleController', [
             $scope.parent_db = null;
             $scope.no_tables = null;
             $scope.tables = [];
+            $scope.desc = [];
             database = this.db;
-            var id = Flash.create('info', "<b> Retrieving tables from </b>" + database + '..', 0, false);
+            var id = Flash.create('info', " Retrieving tables from " + database, 0, false);
             $scope.progressbar.start();
 
             consoleWizardFactory.queryTables(database).then(function (response) {
@@ -104,7 +106,7 @@ app.controller('consoleController', [
             type = $scope.type;
             to_delete = $scope.to_delete;
             parent_db = $scope.parent_db;
-            var id = Flash.create('danger', "<b> Deleting : </b>" + type + ' ' + to_delete + '..', 0, false);
+            var id = Flash.create('danger', " Deleting : " + type + ' ' + to_delete + '..', 0, false);
             $scope.progressbar.start();
             $(".modal").modal("hide");
 
@@ -113,7 +115,8 @@ app.controller('consoleController', [
                 $scope.progressbar.complete();
 
                 if (response.data.success) {
-                    Flash.create('success', type + ' ' + to_delete + ' deleted!', 2000);
+                    message = response.data.msg;
+                    Flash.create('success', type + ' ' + to_delete + ' deleted!' + message, 5000);
                 }
                 else {
                     Flash.create('danger', response.data.error, false);
@@ -125,7 +128,7 @@ app.controller('consoleController', [
         $scope.new_db = function () {
             $(".modal").modal("hide");
             database = $scope.new_database;
-            var id = Flash.create('info', "<b> Creating database : </b>" + database + '..', 0, false);
+            var id = Flash.create('info', " Creating database : " + database + '..', 0, false);
             $scope.progressbar.start();
 
             consoleWizardFactory.createDB(database).then(function (response) {
@@ -133,7 +136,7 @@ app.controller('consoleController', [
                 $scope.progressbar.complete();
 
                 if (response.data.success) {
-                    Flash.create('success', database + ' created!', 2000);
+                    Flash.create('success', database + ' created!', 5000);
                 }
                 else {
                     Flash.create('danger', response.data.error, false);
@@ -146,13 +149,16 @@ app.controller('consoleController', [
             $(".modal").modal("hide");
 
             // toAdd the first column
-            $scope.columns.unshift({'attr': $scope.col_attr, 'type': $scope.col_type});
+            $scope.columns.unshift({
+                'attr': $scope.col_attr,
+                'type': $scope.col_type || ''
+            });
             columns = $scope.columns;
             delim = $scope.delim;
             database = $scope.selected_db;
             table = $scope.table_name;
 
-            var id = Flash.create('info', "<b> Creating Table : </b>" + table + '..', 0, false);
+            var id = Flash.create('info', " Creating Table : " + table, 0, false);
             $scope.progressbar.start();
 
             consoleWizardFactory.createTable(columns,
@@ -164,7 +170,8 @@ app.controller('consoleController', [
                 $scope.init_table();
 
                 if (response.data.success) {
-                    Flash.create('success', table + ' created!', 2000);
+                    message = response.data.msg;
+                    Flash.create('success', table + ' created! ' + message, 5000);
                 }
                 else {
                     Flash.create('danger', response.data.error, false);
@@ -179,5 +186,28 @@ app.controller('consoleController', [
 
         $scope.deleteColumn = function (id) {
             $scope.columns.splice(id, 1);
+        };
+
+        $scope.desc_table = function (table) {
+            $scope.desc = [];
+            var database = $scope.parent_db;
+            var id = Flash.create('info', " Retrieving description for "
+                + table
+                + " in "
+                + database, 0, false);
+            $scope.progressbar.start();
+
+            consoleWizardFactory.desc_table(database, table).then(function (response) {
+                Flash.dismiss(id);
+                $scope.progressbar.complete();
+
+                if (response.data.success) {
+                    $scope.desc = response.data.data;
+                }
+                else {
+                    Flash.create('danger', response.data.error, false);
+                }
+            });
+
         };
     }]);

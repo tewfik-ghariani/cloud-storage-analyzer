@@ -1,18 +1,10 @@
-{% extends "base.html" %}
+{% extends "profil/base_profil.html" %}
 
+{% block title %} LogOut! {% endblock %}
 
+{% block profil_content %}
 
-{%  block content %}
+    <h1> Thanks for visiting Us {{ user.username }} ! </h1>
+    <hr>
 
-
-
-<h1> Thanks for visiting Us {{ user.username }} ! </h1>
-    </hr>
-
-
-
-
-
-
-
-{%  endblock %}
+{% endblock %}

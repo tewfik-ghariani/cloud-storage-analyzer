@@ -1,6 +1,9 @@
+{% load static %}
+
 <div ng-hide="arrived || gotError" class="preload">
+
+    <script type='text/javascript' src="{% static 'bug/bug-min.js' %}"></script>
     <div class="row">
-        {% load static %}
-        <img src="{% static 'images/loader.gif' %}">
+        <div class="loader"></div>
     </div>
 </div>

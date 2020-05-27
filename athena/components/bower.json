@@ -1,0 +1,36 @@
+{
+  "name": "bower.json",
+  "authors": [
+    "Tewfik Ghariani <ghariani.tewfik@gmail.com>"
+  ],
+  "description": "Front-end dependencies",
+  "main": "",
+  "keywords": [
+    "athena"
+  ],
+  "license": "MIT",
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "ag-grid": "^9.0.4",
+    "angular-animate": "1.6.4",
+    "angular-flash-alert": "^2.4.0",
+    "angular-ui-router": "^0.4.2",
+    "angular": "1.6.4",
+    "bootstrap": "3.3.7",
+    "checklist-model": "^0.11.0",
+    "font-awesome": "4.7.0",
+    "jquery": "3.1.1",
+    "ngprogress": "^1.1.3",
+    "underscore": "^1.8.3"
+  },
+  "resolutions": {
+    "angular": "1.6.4"
+  }
+}

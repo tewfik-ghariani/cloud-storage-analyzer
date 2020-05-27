@@ -11,6 +11,7 @@ Django==3.0.6
 django-bower==5.2.0
 docutils==0.15.2
 future==0.18.2
+hurry.filesize==0.9
 idna==2.9
 jmespath==0.10.0
 JPype1==0.7.1

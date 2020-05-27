@@ -100,7 +100,7 @@ $ pip install -r requirements.txt
 ### Front-end Dependencies 
 
 ```sh
-$ python manage.py bower install
+$ python manage.py bower update
 ```
 
 ### DataBase Migration

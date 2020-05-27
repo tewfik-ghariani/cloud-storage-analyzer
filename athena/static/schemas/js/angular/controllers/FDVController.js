@@ -24,16 +24,15 @@ app.controller('FDVController', [
             if (response.data.success) {
                 data = response.data.data;
                 $scope.content = data.content;
-                console.log(data.content);
+                $scope.headers = data.headers;
+                $scope.found = data.fdv.found;
+                Flash.create('info', data.fdv.msg, false);
                 $scope.arrived = true;
-                Flash.create('danger', data.msg, false);
-
+                Flash.create('warning', data.msg, false);
             }
             else {
                 $scope.gotError = true;
                 Flash.create('danger', response.data.error, false);
             }
         });
-
-
     }]);

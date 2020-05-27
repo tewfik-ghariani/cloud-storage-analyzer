@@ -4,8 +4,25 @@
 </div>
 <div ng-show="arrived" class="postload">
 
-    <div class="row">
-        test [[content]]
-    </div>
+    <div ng-if="found" class="row">
 
+        <div ng-repeat="table in content" class="table-responsive">
+            <h6> [[table.unique]] </h6>
+            <table class="table table-striped jambo_table bulk_action">
+
+                <thead>
+                <tr class="headings">
+                    <td ng-repeat="head in headers"><h3>[[ head ]] </h3></td>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr ng-repeat="row in table.table">
+                    <td ng-repeat="cell in row"> [[cell]]</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
 </div>

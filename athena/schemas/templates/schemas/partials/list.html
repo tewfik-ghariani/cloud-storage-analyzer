@@ -35,8 +35,8 @@
         <a ng-show="front" class="list-group-item">
             <button class="btn btn-md btn-primary"
                     ng-click="navigate()"
-                    type="button"
-                    value="..">..
+                    type="button">
+                <i class="fa fa-arrow-circle-left fa-1x" aria-hidden="true"></i>
             </button>
             <span class="badge"> [[ prefix ]] </span>
         </a>
@@ -52,6 +52,12 @@
 
 
         <a ng-repeat="object in objects" class="list-group-item">
+
+            <button type="button" ng-click="getSize($event)" value="[[object]]"
+                    class="btn btn-xs btn-info">
+                <i class="glyphicon glyphicon-info-sign"></i>
+            </button>
+
             <button type="button" ng-click="download($event)" value="[[object]]"
                     class="btn btn-xs btn-default ">
                 <i class="glyphicon glyphicon-download"> </i>
@@ -61,6 +67,7 @@
             <input ng-click="configGet($event)"
                    type="submit" value="[[object]]"
                    class="btn btn-md btn-default"/>
+
             <span class="badge"> File </span>
         </a>
 

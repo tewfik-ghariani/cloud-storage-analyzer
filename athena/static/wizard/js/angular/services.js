@@ -75,8 +75,19 @@ app.factory('consoleWizardFactory', ['$http', function ($http) {
                     'table': table
                 }
             })
-
         },
+
+        desc_table: function (database, table) {
+            return $http({
+                method: 'POST',
+                url: '/wizard/console',
+                data: {
+                    'fetch': 'desc_table',
+                    'database': database,
+                    'table': table
+                }
+            })
+        }
     }
 }]);
 
@@ -107,18 +118,29 @@ app.factory('externalWizardFactory', ['$http', function ($http) {
             })
         },
 
+        getSize: function (object) {
+            return $http({
+                method: 'POST',
+                url: '/wizard/external',
+                data: {
+                    'fetch': 'size',
+                    'object': object
+                }
+            })
+        }
+
     }
 
 }]);
 
 
-app.factory('databaseWizardFactory', ['$http', function ($http) {
+app.factory('metadataWizardFactory', ['$http', function ($http) {
 
     return {
         getCustomers: function () {
             return $http({
                 method: 'POST',
-                url: '/wizard/database',
+                url: '/wizard/metadata',
                 data: {
                     'fetch': 'customers',
                 }
@@ -128,7 +150,7 @@ app.factory('databaseWizardFactory', ['$http', function ($http) {
         addConfig: function (customer, name, rows) {
             return $http({
                 method: 'POST',
-                url: '/wizard/database',
+                url: '/wizard/metadata',
                 data: {
                     'fetch': 'addConfig',
                     'customer': customer,
@@ -138,16 +160,52 @@ app.factory('databaseWizardFactory', ['$http', function ($http) {
             })
         },
 
-        getConfig: function(customer) {
+        get_local_config: function (customer) {
             return $http({
                 method: 'POST',
-                url: '/wizard/database',
+                url: '/wizard/metadata',
                 data: {
-                    'fetch': 'getConfig',
+                    'fetch': 'get_local_config',
                     'customer': customer
                 }
             })
         },
-    }
 
+        fetchFDV: function (customer, object) {
+            return $http({
+                method: 'POST',
+                url: '/wizard/metadata',
+                data: {
+                    'fetch': 'fetchFDV',
+                    'customer': customer,
+                    'object': object
+                }
+            })
+        },
+
+        updateFDV: function (customer, object, fieldsFDV) {
+            return $http({
+                method: 'POST',
+                url: '/wizard/metadata',
+                data: {
+                    'fetch': 'updateFDV',
+                    'customer': customer,
+                    'object': object,
+                    'fieldsFDV': fieldsFDV
+                }
+            })
+        },
+
+        deleteConfig: function (customer, object) {
+            return $http({
+                method: 'POST',
+                url: '/wizard/metadata',
+                data: {
+                    'fetch': 'deleteConfig',
+                    'customer': customer,
+                    'object': object
+                }
+            })
+        },
+    }
 }]);

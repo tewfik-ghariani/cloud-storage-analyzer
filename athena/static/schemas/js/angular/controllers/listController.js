@@ -13,7 +13,7 @@ app.controller('listController', [
               listFactory,
               $state) {
 
-        $rootScope.customer = $state.params.customer_shortcut || $rootScope.customer ;
+        $rootScope.customer = $state.params.customer_shortcut || $rootScope.customer;
         var customer = $rootScope.customer || $scope.customer;
 
         $scope.arrived = false;
@@ -73,15 +73,13 @@ app.controller('listController', [
                 'customer': customer,
                 'object': object
             })
-
-
         };
 
         $scope.download = function (element) {
             var object = element.currentTarget.value;
             var customer = $scope.customer;
 
-            var flash_msg = "<b> Downloading " + object;
+            var flash_msg = " Downloading " + object;
             var info_id = Flash.create('info', flash_msg, 0, false);
             $scope.progressbar.start();
 
@@ -90,7 +88,7 @@ app.controller('listController', [
                 Flash.dismiss(info_id);
 
                 if (response.status == 200) {
-                    flash_msg = "<b> Success! " + object + " successfully downloaded! ";
+                    flash_msg = " Success! '" + object + "' successfully downloaded! ";
                     Flash.create('success', flash_msg);
 
                     var anchor = angular.element('<a/>');
@@ -106,7 +104,10 @@ app.controller('listController', [
                     anchor.remove(); // Clean it up afterwards
                 }
                 else if (response.status == 201) {
-                    Flash.create('danger', 'Error in download');
+                    Flash.create('danger', '  Error in download');
+                }
+                else if (response.status == 202) {
+                    Flash.create('danger', ' This object is in the Glacier Storage class');
                 }
             });
         };
@@ -116,7 +117,7 @@ app.controller('listController', [
             var regex = $scope.regex;
             var customer = $scope.customer;
 
-            var flash_msg = "<b> Searching for " + regex + " .. This might take a while.. ";
+            var flash_msg = " Searching for " + regex + " .. This might take a while.. ";
             var info_id = Flash.create('info', flash_msg, 0, false);
             $scope.progressbar.start();
 
@@ -127,12 +128,37 @@ app.controller('listController', [
                 if (response.data.success) {
                     $scope.folders = [];
                     $scope.front = false;
-                    data = response.data.data;
-                    $scope.objects = data.objects;
-                    flash_msg = "<b> Success! Found "
+                    $scope.objects = response.data.data;
+                    flash_msg = " Success! Found "
                         + data.objects.length
                         + " object(s) that matchs "
                         + regex;
+                    Flash.create('success', flash_msg);
+                }
+                else {
+                    Flash.create('danger', response.data.error, false);
+                }
+            });
+        };
+
+
+        $scope.getSize = function (element) {
+            var object = element.currentTarget.value;
+            var customer = $scope.customer;
+            var flash_msg = " Retrieving size for " + object;
+            var info_id = Flash.create('info', flash_msg, 0, false);
+            $scope.progressbar.start();
+
+            listFactory.getSize(customer, object).then(function (response) {
+                $scope.progressbar.complete();
+                Flash.dismiss(info_id);
+
+                if (response.data.success) {
+                    size = response.data.size;
+                    flash_msg = " File "
+                        + object
+                        + " has the size of "
+                        + size;
                     Flash.create('success', flash_msg);
                 }
                 else {

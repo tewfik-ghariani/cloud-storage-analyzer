@@ -40,6 +40,18 @@ app.factory('listFactory', ['$http', function ($http) {
                     'customer': customer
                 }
             })
+        },
+
+        getSize: function (customer, object) {
+            return $http({
+                method: 'POST',
+                url: '/list/',
+                data: {
+                    'fetch': 'size',
+                    'customer': customer,
+                    'object': object
+                }
+            })
         }
     }
 }]);
@@ -67,7 +79,7 @@ app.factory('detailsFactory', ['$http', function ($http) {
 
     return {
 
-        query: function (customer, object, headers, conditions, custom=false) {
+        query: function (customer, object, headers, conditions, custom=false, xtra=false, xtraHeaders) {
             return $http({
                 method: 'POST',
                 url: '/details/',
@@ -77,7 +89,33 @@ app.factory('detailsFactory', ['$http', function ($http) {
                     'object': object,
                     'headers': headers,
                     'conditions': conditions,
-                    'custom': custom
+                    'custom': custom,
+                    'xtra': xtra,
+                    'xtraHeaders': xtraHeaders
+                }
+            })
+        },
+
+        more: function (query_id, startRow, endRow) {
+            return $http({
+                method: 'POST',
+                url: '/details/',
+                data: {
+                    'fetch': 'more',
+                    'query_id': query_id,
+                    'startRow': startRow,
+                    'endRow': endRow
+                }
+            })
+        },
+
+        export: function (query_id) {
+            return $http({
+                method: 'POST',
+                url: '/details/',
+                data: {
+                    'fetch': 'export',
+                    'query_id': query_id
                 }
             })
         },

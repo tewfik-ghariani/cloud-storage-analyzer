@@ -38,7 +38,9 @@ app.config([
                     object: null,
                     headers: null,
                     conditions: null,
-                    custom: false
+                    custom: false,
+                    xtra: null,
+                    xtraHeaders: null
                 },
                 templateUrl: 'details',
                 controller: 'detailsController'

@@ -4,16 +4,17 @@
 
     {% load static %}
 
-    <link rel="icon" id="icon" href="{% static 'images/icon.png' %}">
+    {% block icon %}
+        <link rel="icon" id="icon" href="{% static 'images/icon.png' %}">
+    {% endblock %}
     <meta charset="utf-8">
-    <title>{% block title %}Athena here we go{% endblock %}</title>
+    <title>{% block title %}Home Page {% endblock %}</title>
 
 
 </head>
-<body>
+<body id="body">
 
-
-<nav class="navbar navbar-collapse collapse">
+<nav class="navigation_bar navbar navbar-collapse collapse">
     <div class="container-fluid">
         <div class="navbar-header">
             <a class="navbar-brand" href="{% url 'welcome' %}"><img src="{% static 'images/company.jpg' %}"/>
@@ -24,100 +25,91 @@
         {% block nav %}
             <ul class="nav navbar-nav">
                 <li><a href="{% url 'welcome' %}"><i class="fa fa-home"></i></a></li>
-                <li><a href="{% url 'second' %}">Infos</a></li>
                 <li><a href="{% url 'index' %}">Customers</a></li>
-                <li><a href="{% url 'wizard' %}"></a></li>
-
-            </ul>
-
-
-
-
-
-            <div class="collapse navbar-collapse">
-            <ul class="nav navbar-nav navbar-right">
-
-                {% if user.is_authenticated %}
-                    <li><a href="{% url 'logout' %}"> <i class="glyphicon glyphicon-log-out">
-                        Logout </i> </a>
-                    </li>
-                    <li class="dropdown" id="profile-dropdown">
-                        <a class="dropdown-toggle" data-toggle="dropdown" href>
-                            <i class="glyphicon glyphicon-user"> {{ user.username }} </i>
-                            <span class="caret"></span></a>
-                        <ul class="dropdown-menu" id="dropdown-elt">
-                            <li><a href="{% url 'profile' %}">Profile</a></li>
-                            <li><a href="{% url 'password_change' %}"> Change password</a></li>
-                        </ul>
-
-                    </li>
-
-
-                {% else %}
-
-                    <li><a href="{% url 'login' %}"> <i class="glyphicon glyphicon-log-in">
-                        Login </i></a></li>
-                    <li><a href="{% url 'register' %}"> <i class="glyphicon glyphicon-floppy-disk">
-                        Register </i></a></li>
+                <li><a href="{% url 'metadata' %}"> Metadata </a></li>
+                {% if request.user.is_active and request.user.is_staff %}
+                    <li><a href="{% url 'wizard' %}"> Wizard </a></li>
                 {% endif %}
             </ul>
 
 
+            <div class="collapse navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+
+                    {% if user.is_authenticated %}
+                        <li><a href="{% url 'logout' %}"> <i class="glyphicon glyphicon-log-out">
+                            Logout </i> </a>
+                        </li>
+                        <li class="dropdown" id="profile-dropdown">
+                            <a class="dropdown-toggle" data-toggle="dropdown" href>
+                                <i class="glyphicon glyphicon-user"> {{ user.username }} </i>
+                                <span class="caret"></span></a>
+                            <ul class="dropdown-menu" id="dropdown-elt">
+                                <li><a href="{% url 'profile' %}">Profile</a></li>
+                                <li><a href="{% url 'password_change' %}"> Change password</a></li>
+                            </ul>
+
+                        </li>
+
+
+                    {% else %}
+
+                        <li><a href="{% url 'login' %}"> <i class="glyphicon glyphicon-log-in">
+                            Login </i></a></li>
+                        <li><a href="{% url 'register' %}"> <i class="glyphicon glyphicon-floppy-disk">
+                            Register </i></a></li>
+                    {% endif %}
+                </ul>
+
+            </div>
+
 
         {% endblock %}
-        </div>
 
 
     </div>
 </nav>
+
+
+{% block content %}
+
+    <img src="{% static 'bug/fly-sprite.png' %}"/>
+    <img src="{% static 'bug/spider-sprite.png' %}"/>
+
+{% endblock %}
 <div class="container">
-
-    {% block content %}
-
-        <div class="jumbotron">
-            <h1>Hello, Aps!</h1>
-            <p>Start manoeuvring through the first prototype of the cloud storage analyzer!
-                Most of the features offered here take some while, so grab a coffee and be patient!
-                <i class="fa fa-coffee" aria-hidden="true"></i></p>
-
-        </div>
-
-
-
-    {% endblock %}
-
-
-
-
-    <div class="row">
-        <footer>&copy; 2020</footer>
+    <div class="row pull-right">
+        <p class="copyright text-muted small">Copyleft &copy; No Rights Reserved</p>
     </div>
-
-
-    <!-- font-awesome -->
-    <link rel="stylesheet" type="text/css" href="{% static 'font-awesome/css/font-awesome.min.css' %}"/>
-
-
-    <!-- JQuery -->
-    <script type="text/javascript" src="{% static 'jquery/dist/jquery.min.js' %}"></script>
-
-
-    <!-- bootstrap -->
-    <link rel="stylesheet" type="text/css" href="{% static 'bootstrap/dist/css/bootstrap.min.css' %}"/>
-    <script type="text/javascript" src="{% static 'bootstrap/dist/js/bootstrap.min.js' %}"></script>
-
-
-    <!-- underscore -->
-    <script type="text/javascript" src="{% static 'underscore/underscore-min.js' %}"></script>
-
-
-    <!-- custom css -->
-    <link rel="stylesheet" href="{% static 'schemas/css/style.css' %}"/>
-    <!-- main js -->
-    <script type="text/javascript" src="{% static 'schemas/js/main.js' %}"></script>
-
-    {% block extra_static %}{% endblock %}
-
 </div>
+
+<!-- font-awesome -->
+<link rel="stylesheet" type="text/css" href="{% static 'font-awesome/css/font-awesome.min.css' %}"/>
+
+
+<!-- JQuery -->
+<script type="text/javascript" src="{% static 'jquery/dist/jquery.min.js' %}"></script>
+
+
+<!-- bootstrap -->
+<link rel="stylesheet" type="text/css" href="{% static 'bootstrap/dist/css/bootstrap.min.css' %}"/>
+<script type="text/javascript" src="{% static 'bootstrap/dist/js/bootstrap.min.js' %}"></script>
+
+
+<!-- underscore -->
+<script type="text/javascript" src="{% static 'underscore/underscore-min.js' %}"></script>
+
+
+<!-- base css -->
+<link rel="stylesheet" href="{% static 'css/base.css' %}"/>
+
+<!-- vendor css -->
+<link rel="stylesheet" href="{% static 'css/landing-page.css' %}"/>
+
+
+{% block css %}{% endblock %}
+{% block extra_static %}{% endblock %}
+
+
 </body>
 </html>

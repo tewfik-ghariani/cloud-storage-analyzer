@@ -28,6 +28,8 @@ app.controller('configController', [
                 $scope.object = data.object;
                 $scope.customer = data.customer;
                 $scope.bucket = data.bucket;
+                $scope.nbr_headers = data.nbr_headers;
+                $scope.xtraHeaders = [];
                 $scope.arrived = true;
             }
             else {
@@ -39,18 +41,23 @@ app.controller('configController', [
         $scope.query = function () {
             $('.modal').modal('hide');
             $('.modal-backdrop').remove();
+            $('#body').removeClass('modal-open');
 
             var customer = $scope.customer;
             var object = $scope.object;
             var headers = $scope.user.headers;
+            var xtraHeaders = $scope.xtraHeaders;
             var conditions = $scope.conds;
+            var xtra = $scope.xtra;
 
 
             $state.go('details', params = {
                 'customer': customer,
                 'object': object,
                 'headers': headers,
-                'conditions': conditions
+                'conditions': conditions,
+                'xtra': xtra,
+                'xtraHeaders': xtraHeaders
             });
         };
 
@@ -106,6 +113,7 @@ app.controller('configController', [
         $scope.FDVcheck = function () {
             $('.modal').modal('hide');
             $('.modal-backdrop').remove();
+            $('#body').removeClass('modal-open');
 
             var customer = $scope.customer;
             var object = $scope.object;
@@ -116,4 +124,11 @@ app.controller('configController', [
             });
         };
 
+        $scope.addXtraHead = function () {
+            $scope.xtraHeaders.push({'op': '', 'col': ''})
+        };
+
+        $scope.delXtraHead = function (id) {
+            $scope.xtraHeaders.splice(id, 1);
+        };
     }]);

@@ -4,18 +4,19 @@ from django.http import HttpResponse, JsonResponse
 from django.urls import reverse
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.auth.decorators import login_required
 from django.core.management import call_command
 import os
 import json
 
 from lib import athenajdbcWrapper
 from lib import botoWrapper
-from lib import metadata
+from lib import metadataWrapper
 
 
 @staff_member_required
-def base(request):
-    return render(request, "wizard/base.html")
+def wizard(request):
+    return render(request, "wizard/wizard.html")
 
 
 @staff_member_required
@@ -52,10 +53,12 @@ def console(request):
             table = req["table"]
             parent_db = req["parent_db"]
             is_deleted = athena.query("DROP TABLE {0}.{1};".format(parent_db, table))
-            if is_deleted["success"]:
-                return JsonResponse({"success": True})
-            else:
+            if not is_deleted["success"]:
                 return JsonResponse(is_deleted)
+
+            # Remove from local database automatically
+            local_is_deleted = metadataWrapper.del_config(parent_db, table, auto=True)
+            return JsonResponse(local_is_deleted)
 
         if fetched == "manip_db":
             manip = req["manip"]
@@ -66,15 +69,18 @@ def console(request):
                 delete_or_create = False
 
             res_manip = athena.db_manip(db, delete_or_create)
-            if not res_manip["success"]:
-                return JsonResponse(res_manip)
-
-            return JsonResponse({"success": True})
+            return JsonResponse(res_manip)
 
         if fetched == "create_table":
             columns = req["columns"]
             delim = req["delim"]
-            database = req["database"]
+            try:
+                database = req["database"]
+                if not database:
+                    raise KeyError
+            except KeyError:
+                return JsonResponse({"success": False, "error": "Select a Database!"})
+
             table = req["table"]
             athena = athenajdbcWrapper.PyAthenaLoader()
             # create in athena catalog
@@ -83,11 +89,18 @@ def console(request):
                 return JsonResponse(created)
 
             # Add to local database automatically
-            added = metadata.addConfig(database, table, columns, auto=True)
-            if not added["success"]:
-                return JsonResponse(added)
+            added = metadataWrapper.addConfig(database, table, columns, auto=True)
+            return JsonResponse(added)
 
-            return JsonResponse({"success": True})
+        if fetched == "desc_table":
+            database = req["database"]
+            table = req["table"]
+            athena = athenajdbcWrapper.PyAthenaLoader()
+            tableDesc = athena.desc(database, table)
+            return JsonResponse(tableDesc)
+
+        else:
+            return JsonResponse({"success": False, "error": "Are you lost?"})
 
 
 @staff_member_required
@@ -98,6 +111,7 @@ def external(request):
 
         # Handle Purge Request
         if request.POST.get("purge"):
+            botoWrapper.BotoLoader.folders = []
             call_command("purge")
             messages.success(request, "Bucket Purged Successfully! ")
             return redirect(reverse("external"))
@@ -106,7 +120,7 @@ def external(request):
         fetched = req["fetch"]
 
         customer = "external"
-        s3_location, region = metadata.s3_verif(customer)
+        s3_location, region = metadataWrapper.s3_verif(customer)
         aws = botoWrapper.BotoLoader(s3_location, region)
 
         # Handle Delete request
@@ -118,22 +132,30 @@ def external(request):
             else:
                 return JsonResponse(is_deleted)
 
+        # Handle getSize request
+        if fetched == "size":
+            object = req["object"]
+            size = aws.getSize(object, external=True)
+            return JsonResponse(size)
+
         # Handle Download request
         if fetched == "download":
             file = req["file"]
             res_download = aws.download_from_bucket(file)
             if not res_download["success"]:
-                return HttpResponse(status=201)
-            content = res_download["data"]
-            content_type = content["content_type"]
-            content_length = content["content_length"]
-            content_disposition = content["content_disposition"]
+                return HttpResponse(status=202)
+            try:
+                content = res_download["data"]
+                filename = content["filename"]
 
-            wrapper = FileWrapper(open(file))
-            response = HttpResponse(wrapper, content_type=content_type)
-            response["Content-Length"] = content_length
-            response["Content-Disposition"] = content_disposition
-            os.remove(file)
+                wrapper = FileWrapper(open(filename))
+                response = HttpResponse(wrapper, content_type=content["content_type"])
+                response["Content-Length"] = content["content_length"]
+                response["Content-Disposition"] = content["content_disposition"]
+                os.remove(filename)
+            except Exception as X:
+                print(X.args[0])
+                return HttpResponse(status=201)
             return response
 
         # Handle getObjects request
@@ -154,8 +176,15 @@ def external(request):
             if prefix == "":
                 front = False
 
-            folders = aws.s3_prefixes(prefix)
-            objects = aws.s3loader(prefix)
+            folders_rep = aws.s3_prefixes(prefix)
+            if not folders_rep["success"]:
+                return JsonResponse(folders_rep)
+            folders = folders_rep["data"]
+
+            objects_rep = aws.s3loader(prefix)
+            if not objects_rep["success"]:
+                return JsonResponse(objects_rep)
+            objects = objects_rep["data"]
 
             return JsonResponse(
                 {
@@ -170,44 +199,81 @@ def external(request):
                 }
             )
 
+        else:
+            return JsonResponse({"success": False, "error": "Are you lost?"})
 
-@staff_member_required
-def database(request):
+
+@login_required
+def metadata(request):
     if request.method == "GET":
-        return render(request, "wizard/database.html")
+        return render(request, "wizard/metadata.html")
     elif request.method == "POST":
         req = json.loads(request.body.decode())
         fetched = req["fetch"]
 
         if fetched == "customers":
-            customers = metadata.get_clients(True)
+            customers = metadataWrapper.get_clients()
             return JsonResponse({"success": True, "data": {"customers": customers}})
 
         if fetched == "addConfig":
-            customer = req["customer"]
-            name = req["name"]
-            rows = req["rows"]
-            added = metadata.addConfig(customer, name, rows)
-            if not added["success"]:
-                return JsonResponse(added)
-            return JsonResponse({"success": True})
-
-        if fetched == "getConfig":
             try:
                 customer = req["customer"]
-            except:
+                if not customer:
+                    raise KeyError
+            except KeyError:
+                return JsonResponse({"success": False, "error": "Select a customer!"})
+            name = req["name"]
+            rows = req["rows"]
+            added = metadataWrapper.addConfig(customer, name, rows)
+            return JsonResponse(added)
+
+        if fetched == "get_local_config":
+            try:
+                customer = req["customer"]
+                if not customer:
+                    raise KeyError
+            except KeyError:
                 return JsonResponse({"success": False, "error": "Choose a customer"})
 
-            configuration = metadata.getAllConfig(customer)
-            if not configuration["success"]:
-                return JsonResponse(configuration)
+            configuration = metadataWrapper.get_all_config(customer)
+            return JsonResponse(configuration)
 
-            content = configuration["data"]
-            rowData = []
-            for row in content:
-                new_line = {}
-                new_line["group"] = row["name"]
-                new_line["participants"] = row["headers"]
-                rowData.append(new_line)
+        if fetched == "fetchFDV":
+            try:
+                customer = req["customer"]
+                object = req["object"]
+                if not customer or not object:
+                    raise KeyError
+            except KeyError:
+                return JsonResponse({"success": False, "error": "Try again"})
 
-            return JsonResponse({"success": True, "rowdata": rowData})
+            found_config = metadataWrapper.fetch_fieldsFDV(customer, object)
+            return JsonResponse(found_config)
+
+        if fetched == "updateFDV":
+            try:
+                customer = req["customer"]
+                object = req["object"]
+                fieldsFDV = req["fieldsFDV"]
+                if not customer or not object:
+                    raise KeyError
+            except KeyError:
+                return JsonResponse({"success": False, "error": "Try again"})
+
+            update_fieldsFDV = metadataWrapper.updateFDV(customer, object, fieldsFDV)
+            return JsonResponse(update_fieldsFDV)
+
+        if fetched == "deleteConfig":
+            try:
+                customer = req["customer"]
+                object = req["object"]
+                if not customer or not object:
+                    raise KeyError
+            except KeyError:
+                return JsonResponse({"success": False, "error": "Try again"})
+
+            deleteConfiguration = metadataWrapper.del_config(customer, object)
+            return JsonResponse(deleteConfiguration)
+
+        else:
+            return JsonResponse({"success": False, "error": "Are you lost?"})

@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 """
 
 import os
+import configparser
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -74,14 +75,25 @@ WSGI_APPLICATION = "athena.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 
+# Get database configuration from local.ini
+conf_DB = BASE_DIR + "/lib/static/local.ini"
+Config = configparser.ConfigParser()
+Config.read(os.path.expanduser(conf_DB))
+
+NAME = Config["postgres"]["NAME"]
+USER = Config["postgres"]["USER"]
+PASSWORD = Config["postgres"]["PASSWORD"]
+HOST = Config["postgres"]["HOST"]
+PORT = Config["postgres"]["PORT"]
+
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql_psycopg2",  # 'django.db.backends.postgresql',
-        "NAME": "athena_db",  # DataBase name
-        "USER": "si_aps",
-        "PASSWORD": "***********",
-        "HOST": "localhost",
-        "PORT": "",
+        "NAME": NAME,
+        "USER": USER,
+        "PASSWORD": PASSWORD,
+        "HOST": HOST,
+        "PORT": PORT,
     },
 }
 
@@ -125,30 +137,21 @@ BOWER_COMPONENTS_ROOT = os.path.join(BASE_DIR, "components")
 
 BOWER_PATH = "/usr/local/bin/bower"
 
-BOWER_INSTALLED_APPS = (
-    "bootstrap#3.3.7",
-    "jquery#3.1.1",
-    "underscore",
-    "font-awesome#4.7.0",
-    "angular#1.6.4",
-    "ngprogress#1.1.3",
-    "angular-animate#1.6.4",
-    "angular-flash-alert#2.4.0",
-    "angular-ui-router#0.4.2",
-    "checklist-model#0.11.0",
-    "ag-grid#9.0.4",
-)
-
 STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"),)
 
 LOGIN_URL = "/user/login"
 LOGIN_REDIRECT_URL = "/"
 
+# Get mail configuration from mail.ini
+conf_mail = BASE_DIR + "/lib/static/mail.ini"
+Config = configparser.ConfigParser()
+Config.read(os.path.expanduser(conf_mail))
+
 EMAIL_USE_TLS = True
-DEFAULT_FROM_EMAIL = "herpakaapp@gmail.com"
-SERVER_EMAIL = "herpakaapp@gmail.com"
-EMAIL_HOST = "smtp.gmail.com"
-EMAIL_PORT = 587
-EMAIL_HOST_USER = "herpakaapp@gmail.com"
-EMAIL_HOST_PASSWORD = "******"
+DEFAULT_FROM_EMAIL = Config["mail"]["DEFAULT_FROM_EMAIL"]
+SERVER_EMAIL = Config["mail"]["SERVER_EMAIL"]
+EMAIL_HOST = Config["mail"]["EMAIL_HOST"]
+EMAIL_PORT = Config["mail"]["EMAIL_PORT"]
+EMAIL_HOST_USER = Config["mail"]["EMAIL_HOST_USER"]
+EMAIL_HOST_PASSWORD = Config["mail"]["EMAIL_HOST_PASSWORD"]
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"

@@ -1,0 +1,186 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+    <!-- Header -->
+    <a name="about"></a>
+    <div class="intro-header">
+        <div class="container">
+
+            <div class="row">
+                <div class="col-lg-12">
+
+                    <div class="intro-message">
+                        <h1>Welcome to CS Analyzer!</h1>
+                        <h3>The Cloud storage analyzer for </h3>
+                        <hr class="intro-divider">
+                        <br><br><br>
+                        <ul class="list-inline intro-social-buttons">
+                            <li>
+                                <a target="_blank" href="https://twitter.com/"
+                                   class="btn btn-default btn-lg">
+                                    <i class="fa fa-twitter fa-fw"></i>
+                                    <span class="network-name">Twitter</span></a>
+                            </li>
+                            <li>
+                                <a target="_blank" href="https://www.facebook.com/"
+                                   class="btn btn-default btn-lg">
+                                    <i class="fa fa-facebook fa-fw"></i> <span class="network-name">Facebook</span></a>
+                            </li>
+                            <li>
+                                <a target="_blank" href="https://www.linkedin.com/"
+                                   class="btn btn-default btn-lg">
+                                    <i class="fa fa-linkedin fa-fw"></i> <span class="network-name">Linkedin</span></a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <!-- /.container -->
+
+    </div>
+    <!-- /.intro-header -->
+
+    <!-- Page Content -->
+
+    <a name="services"></a>
+    <div class="content-section-a">
+
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-5 col-sm-6">
+                    <hr class="section-heading-spacer">
+                    <div class="clearfix"></div>
+                    <h2 class="section-heading">Overview</h2>
+                    <p class="wall lead">
+                        Start manoeuvring through the cloud storage analyzer!
+                        Most of the features offered here take some while, so grab a coffee and be patient!
+                        <i class="fa fa-coffee" aria-hidden="true"></i></p>
+                </div>
+                <div class="col-lg-5 col-lg-offset-2 col-sm-6">
+                    <img class="img-responsive" src="{% static 'images/navigate.png' %}" alt="">
+                </div>
+            </div>
+
+        </div>
+        <!-- /.container -->
+
+    </div>
+    <!-- /.content-section-a -->
+
+    <div class="content-section-b">
+
+        <div class="container">
+
+            <div class="row">
+                <div class="col-lg-5 col-lg-offset-1 col-sm-push-6  col-sm-6">
+                    <hr class="section-heading-spacer">
+                    <div class="clearfix"></div>
+                    <h2 class="section-heading">User-friendly, efficient and scalable</h2>
+                    <p class="well lead"> Navigate easily in the customer's bucket and construct your query using easily
+                        manageable interface</p>
+                </div>
+                <div class="col-lg-5 col-sm-pull-6  col-sm-6">
+                    <img class="img-responsive" src="{% static 'images/query.png' %}" alt="">
+                </div>
+            </div>
+
+        </div>
+        <!-- /.container -->
+
+    </div>
+    <!-- /.content-section-b -->
+
+    <div class="content-section-a">
+
+        <div class="container">
+
+            <div class="row">
+                <div class="col-lg-5 col-sm-6">
+                    <hr class="section-heading-spacer">
+                    <div class="clearfix"></div>
+                    <h2 class="section-heading">Highly Available, Secure and elastic </h2>
+                    <p class="wall lead">
+                        Using cost-effective and feature-driven Amazon Web Services, the application provides the
+                        results of the queries in the due time
+                    </p>
+                </div>
+                <div class="col-lg-5 col-lg-offset-2 col-sm-6">
+                    <img class="img-responsive" src="{% static 'images/results.png' %}" alt="">
+                </div>
+            </div>
+
+        </div>
+        <!-- /.container -->
+
+    </div>
+    <!-- /.content-section-a -->
+
+    <a name="contact"></a>
+    <div class="banner">
+
+        <div class="container">
+
+            <div class="row">
+                <div class="col-lg-6">
+                    <h2>Other Tools</h2>
+                </div>
+                <div class="col-lg-6">
+                    <ul class="list-inline banner-social-buttons">
+                        <li>
+                            <a target="_blank" href="http://aps.dashboard.com"
+                               class="btn btn-default btn-md">
+                                <i class="fa fa-id-card fa-fw"></i> <span
+                                    class="network-name">Aps Dashboard</span></a>
+                        </li>
+                        <li>
+                            <a target="_blank" href="http://aps.hello.com/"
+                               class="btn btn-default btn-md"><i class="fa fa-book fa-fw"></i> <span
+                                    class="network-name">Hello APS</span></a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+        <!-- /.container -->
+
+    </div>
+    <!-- /.banner -->
+
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <ul class="list-inline">
+                        <li>
+                            <a href="{% url 'welcome' %}">Home</a>
+                        </li>
+                        <li class="footer-menu-divider">&sdot;</li>
+                        <li>
+                            <a href="#about">About</a>
+                        </li>
+                        <li class="footer-menu-divider">&sdot;</li>
+                        <li>
+                            <a href="#services">Services</a>
+                        </li>
+                        <li class="footer-menu-divider">&sdot;</li>
+                        <li>
+                            <a href="#contact">Links</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+{% endblock %}
+
+{% block css %}
+    <!-- custom css -->
+    <link rel="stylesheet" href="{% static 'schemas/css/style.css' %}"/>
+{% endblock %}

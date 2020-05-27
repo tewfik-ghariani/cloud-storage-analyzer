@@ -1,77 +1,86 @@
-{% extends "base.html" %}
+{% extends "profil/base_profil.html" %}
 
 {% block title %} Register Page {% endblock %}
 
-{% block content %}
+{% block profil_content %}
 
-    {% if registered %} You have been registered!{% endif %}
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
 
-    <div class="container">
-        <div class="row">
-
-
-            {% if user.is_authenticated %}
-
-                <h1> How many times would like to register? </h1>
-                </hr>
-                <h3>
-                    <a href="{% url 'logout' %}">
-                        <button class="btn btn-warning"> Logout</button>
-                    </a> first before trying to register!
-                </h3>
-            {% else %}
+    {% if registered %} You are registered!
+    {% else %}
+        <div class="container">
+            <div class="row">
 
 
-                {% if messages %}
-                    <ul class="messages">
-                        {% for message in messages %}
-                            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-                        {% endfor %}
-                    </ul>
+                {% if user.is_authenticated %}
+
+                    <h1> How many times would like to register? </h1>
+                    </hr>
+                    <h3>
+                        <a href="{% url 'logout' %}">
+                            <button class="btn btn-warning"> Logout</button>
+                        </a> first before trying to register!
+                    </h3>
+                {% else %}
+
+
+
+
+
+
+
+                    <div class="col-sm-6 col-md-4 col-md-offset-4">
+                        <hr/>
+                        <h2 class="title text-center"> Register Now! </h2>
+                        <hr/>
+                        <div class="account-wall">
+                            <form action="{% url "register" %}" method="post">
+                                {% csrf_token %}
+                                <div class="form-group">
+
+                                    <label for="id_username">Username:</label> <input id="id_username"
+                                                                                      class="form-control"
+                                                                                      maxlength="100" name="username"
+                                                                                      type="text" required/>
+                                    <label for="id_pwd">Password:</label> <input id="id_pwd" class="form-control"
+                                                                                 name="pwd"
+                                                                                 type="password" required/>
+                                    <label for="id_first_name">First name:</label> <input id="id_first_name"
+                                                                                          class="form-control"
+                                                                                          maxlength="100"
+                                                                                          name="first_name"
+                                                                                          type="text" required/>
+                                    <label for="id_last_name">Last name:</label> <input id="id_last_name"
+                                                                                        class="form-control"
+                                                                                        maxlength="100"
+                                                                                        name="last_name" type="text"
+                                                                                        required/>
+                                    <label for="id_mail">Mail:</label> <input id="id_mail" class="form-control"
+                                                                              name="mail"
+                                                                              type="email" required/> <span
+                                        class="helptext">someone@mail.com</span>
+
+
+                                </div>
+                                <input class="btn btn-md btn-success btn-block" type="submit" value="Submit"/>
+                            </form>
+
+                        </div>
+                    </div>
+
+
                 {% endif %}
 
 
-
-
-                <div class="col-sm-6 col-md-4 col-md-offset-4">
-                    <hr/>
-                    <h2 class="title text-center"> Register Now! </h2>
-                    <hr/>
-                    <div class="account-wall">
-                        <form action="{% url "register" %}" method="post">
-                            {% csrf_token %}
-                            <div class="form-group">
-
-                                <label for="id_username">Username:</label> <input id="id_username" class="form-control"
-                                                                                  maxlength="100" name="username"
-                                                                                  type="text" required/>
-                                <label for="id_pwd">Password:</label> <input id="id_pwd" class="form-control" name="pwd"
-                                                                             type="password" required/>
-                                <label for="id_first_name">First name:</label> <input id="id_first_name"
-                                                                                      class="form-control"
-                                                                                      maxlength="100" name="first_name"
-                                                                                      type="text" required/>
-                                <label for="id_last_name">Last name:</label> <input id="id_last_name"
-                                                                                    class="form-control" maxlength="100"
-                                                                                    name="last_name" type="text"
-                                                                                    required/>
-                                <label for="id_mail">Mail:</label> <input id="id_mail" class="form-control" name="mail"
-                                                                          type="email" required/>
-
-                            </div>
-                            <input class="btn btn-md btn-success btn-block" type="submit" value="Submit"/>
-                        </form>
-
-                    </div>
-                </div>
-
-
-            {% endif %}
-
-
+            </div>
         </div>
-    </div>
-
+    {% endif %}
 
 
 {% endblock %}

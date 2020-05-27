@@ -1,10 +1,17 @@
-{% extends "base.html" %}
+{% extends "profil/base_profil.html" %}
 
 {% block title %} Account {% endblock %}
 
-{% block content %}
+{% block profil_content %}
 
 
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li{% if message.tags %} class="alert alert-{{ message.tags }}"{% endif %}>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
 
 
     <form action="{% url 'profile' %}" method="post">
@@ -31,7 +38,7 @@
                                name="last_name" type="text" {{ is_disabled }} />
 
                         <label for="id_mail">Mail:</label>
-                        <input id="id_mail" value="{{ usr.email }}" class="form-control" name="mail"
+                        <input id="id_mail" value="{{ usr.email }}" class="form-control" name="email"
                                type="email"  {{ is_disabled }}/>
 
 
@@ -41,11 +48,17 @@
 
                 <div class="row">
                     <div class="col-md-6">
-                        <input class="btn btn-group-xs btn-success btn-block" type="submit" value="Edit"/>
+                        <input class="btn btn-group-xs btn-success btn-block"
+                               name="edit"
+                               type="submit"
+                               value="Edit"/>
                     </div>
                     <div class="col-md-6">
-                        <input class="btn btn-group-xs btn-warning btn-block" type="submit"
-                               value="Save" {{ is_disabled }} />
+                        <input class="btn btn-group-xs btn-warning btn-block"
+                               type="submit"
+                               name="save"
+                               value="Save"
+                                {{ is_disabled }} />
                     </div>
                 </div>
 
