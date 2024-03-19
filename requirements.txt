@@ -7,7 +7,7 @@ botocore==1.16.17
 certifi==2022.12.7
 chardet==3.0.4
 click==7.1.2
-Django==3.2.24
+Django==3.2.25
 django-bower==5.2.0
 docutils==0.15.2
 future==0.18.3
